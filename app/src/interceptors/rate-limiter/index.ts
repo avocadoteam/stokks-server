@@ -1,6 +1,6 @@
 import * as RateLimiter from 'rate-limiter-flexible';
 import * as redis from 'redis';
-import moment from 'moment';
+import * as moment from 'moment';
 import { Response, Request } from 'express';
 import { HttpStatus, Injectable, NestMiddleware, Inject } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
