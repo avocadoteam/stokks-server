@@ -23,7 +23,7 @@ async function bootstrap() {
   const port = configService.get<number>('core.port', 3000);
   await app.listen(port, () => {
     console.log(moment().format('DD MM YYYY hh:mm:ss'));
-    console.log('Server listen on port', port);
+    console.log('Server listen on port', port, 'in', process.env.NODE_ENV, 'mode');
   });
 }
 bootstrap();
