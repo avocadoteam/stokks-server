@@ -18,6 +18,11 @@
     "noFallthroughCasesInSwitch": true,
     "importHelpers": true,
     "forceConsistentCasingInFileNames": true,
-    "strictPropertyInitialization": false
+    "strictPropertyInitialization": false,
+    "paths": {
+      "@models": [
+        "../stokks-models/index"
+      ],
+    }
   }
 }
