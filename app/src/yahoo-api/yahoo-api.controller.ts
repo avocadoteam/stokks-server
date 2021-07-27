@@ -1,4 +1,3 @@
-import { HistoryPeriodTarget } from '@models';
 import { Controller, Get, Query, UseInterceptors } from '@nestjs/common';
 import { TransformInterceptor } from 'src/interceptors/transform.interceptor';
 import { YahooApiService } from './yahoo-api.service';
@@ -10,6 +9,6 @@ export class YahooApiController {
 
   @Get()
   getInfo(@Query('query') query: string) {
-    return this.ya.getSymbolHistory(query, HistoryPeriodTarget.TenYears);
+    return this.ya.getLatestNews(query);
   }
 }

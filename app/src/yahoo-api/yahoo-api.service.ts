@@ -1,4 +1,4 @@
-import { HistoryPeriodTarget, SymbolGeneralInfo, YahooSearchResult } from '@models';
+import { HistoryPeriodTarget, NewsItem, SymbolGeneralInfo, YahooSearchResult } from '@models';
 import { Injectable } from '@nestjs/common';
 import * as moment from 'moment';
 import { brokenSymbol } from 'src/contracts/yahoo';
@@ -63,6 +63,17 @@ export class YahooApiService {
   async getSymbolHistory(symbol: string, target: HistoryPeriodTarget) {
     const history = await yahooFinance.historical(symbol, this.getPeriodFromTarget(target));
     return history;
+  }
+
+  async getLatestNews(query: string): Promise<NewsItem[]> {
+    const { news } = await yahooFinance.search(query, { newsCount: 5, quotesCount: 0 });
+    return news.map(r => ({
+      link: r.link,
+      providerPublishTime: r.providerPublishTime,
+      publisher: r.publisher,
+      title: r.title,
+      uuid: r.uuid,
+    }));
   }
 
   private getPeriodFromTarget(target: HistoryPeriodTarget): HistoricalOptions {
