@@ -9,6 +9,6 @@ export class YahooApiController {
 
   @Get()
   getInfo(@Query('query') query: string) {
-    return this.ya.startSearch(query);
+    return this.ya.getSymbolHistory(query);
   }
 }
