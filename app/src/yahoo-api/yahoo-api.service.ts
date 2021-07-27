@@ -1,7 +1,9 @@
-import { SymbolGeneralInfo, YahooSearchResult } from '@models';
+import { HistoryPeriodTarget, SymbolGeneralInfo, YahooSearchResult } from '@models';
 import { Injectable } from '@nestjs/common';
+import * as moment from 'moment';
 import { brokenSymbol } from 'src/contracts/yahoo';
 import yahooFinance from 'yahoo-finance2';
+import { HistoricalOptions } from 'yahoo-finance2/dist/esm/src/modules/historical';
 import { Quote, QuoteResponseArray } from 'yahoo-finance2/dist/esm/src/modules/quote';
 
 @Injectable()
@@ -58,8 +60,46 @@ export class YahooApiService {
     };
   }
 
-  async getSymbolHistory(symbol: string) {
-    const history = await yahooFinance.historical(symbol, { period1: '2021-07-27' });
+  async getSymbolHistory(symbol: string, target: HistoryPeriodTarget) {
+    const history = await yahooFinance.historical(symbol, this.getPeriodFromTarget(target));
     return history;
+  }
+
+  private getPeriodFromTarget(target: HistoryPeriodTarget): HistoricalOptions {
+    switch (target) {
+      case HistoryPeriodTarget.Week:
+        return {
+          period1: moment().subtract(1, 'week').format('YYYY-MM-DD'),
+          period2: moment().format('YYYY-MM-DD'),
+        };
+      case HistoryPeriodTarget.Month:
+        return {
+          period1: moment().subtract(1, 'month').format('YYYY-MM-DD'),
+          period2: moment().format('YYYY-MM-DD'),
+        };
+      case HistoryPeriodTarget.Year:
+        return {
+          period1: moment().subtract(1, 'year').format('YYYY-MM-DD'),
+          period2: moment().format('YYYY-MM-DD'),
+        };
+      case HistoryPeriodTarget.FiveYears:
+        return {
+          period1: moment().subtract(5, 'years').format('YYYY-MM-DD'),
+          period2: moment().format('YYYY-MM-DD'),
+          interval: '1mo',
+        };
+      case HistoryPeriodTarget.TenYears:
+        return {
+          period1: moment().subtract(10, 'years').format('YYYY-MM-DD'),
+          period2: moment().format('YYYY-MM-DD'),
+          interval: '1mo',
+        };
+
+      case HistoryPeriodTarget.Day:
+      default:
+        return {
+          period1: moment().format('YYYY-MM-DD'),
+        };
+    }
   }
 }
