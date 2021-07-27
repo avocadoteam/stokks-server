@@ -8,6 +8,7 @@ import { twitterConfig } from './config/twitter.config';
 import { FaSearchModule } from './fa-search/fa-search.module';
 import { RedisCacheModule } from './redis-cache/redis-cache.module';
 import { TwitterApiModule } from './twitter-api/twitter-api.module';
+import { UrlParserModule } from './url-parser/url-parser.module';
 import { YahooApiModule } from './yahoo-api/yahoo-api.module';
 
 @Module({
@@ -20,6 +21,7 @@ import { YahooApiModule } from './yahoo-api/yahoo-api.module';
     FaSearchModule,
     YahooApiModule,
     TwitterApiModule,
+    UrlParserModule,
   ],
   controllers: [AppController],
 })
