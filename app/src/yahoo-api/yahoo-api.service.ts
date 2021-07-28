@@ -1,7 +1,6 @@
 import { HistoryPeriodTarget, NewsItem, SymbolGeneralInfo, YahooSearchResult } from '@models';
 import { Injectable } from '@nestjs/common';
 import * as moment from 'moment';
-import { brokenSymbol } from 'src/contracts/yahoo';
 import yahooFinance from 'yahoo-finance2';
 import { HistoricalOptions } from 'yahoo-finance2/dist/esm/src/modules/historical';
 import { Quote, QuoteResponseArray } from 'yahoo-finance2/dist/esm/src/modules/quote';
@@ -11,7 +10,7 @@ export class YahooApiService {
   async startSearch(query: string): Promise<YahooSearchResult[]> {
     const { Result: autocResults } = await yahooFinance.autoc(query);
 
-    const symbols = autocResults.map(r => r.symbol).filter(s => s !== brokenSymbol);
+    const symbols = autocResults.map(r => r.symbol);
 
     if (!symbols?.length) {
       return [];
@@ -77,7 +76,7 @@ export class YahooApiService {
   }
   async getTrendingSymbols(count: number): Promise<YahooSearchResult[]> {
     const { quotes } = await yahooFinance.trendingSymbols('US', { count });
-    const symbols = quotes.map(r => r.symbol).filter(s => s !== brokenSymbol);
+    const symbols = quotes.map(r => r.symbol);
 
     if (!symbols?.length) {
       return [];
