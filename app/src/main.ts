@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as moment from 'moment';
 import * as logger from 'morgan';
 import { join } from 'path';
@@ -20,6 +21,11 @@ async function bootstrap() {
   );
   app.useGlobalInterceptors(new TimeoutInterceptor());
   app.useStaticAssets(join(__dirname, '../../..', 'public'));
+
+  const config = new DocumentBuilder().setTitle('Stokks api').setVersion('1.0').build();
+  const document = SwaggerModule.createDocument(app, config, {});
+  SwaggerModule.setup('api', app, document);
+
   const port = configService.get<number>('core.port', 3000);
   await app.listen(port, () => {
     console.log(moment().format('DD MM YYYY hh:mm:ss'));
