@@ -1,22 +1,28 @@
 import { Tweet } from '@models';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { twitterConfig } from 'src/config/twitter.config';
 import { TwitterClient } from 'twitter-api-client';
 
 @Injectable()
 export class TwitterApiService {
+  private readonly logger = new Logger(TwitterApiService.name);
   twitterClient: TwitterClient;
   constructor(
     @Inject(twitterConfig.KEY)
     private readonly config: ConfigType<typeof twitterConfig>,
   ) {
-    this.twitterClient = new TwitterClient({
-      apiKey: config.apiKey ?? '',
-      apiSecret: config.apiSecret ?? '',
-      accessToken: config.accessToken,
-      accessTokenSecret: config.accessTokenSecret,
-    });
+    try {
+      this.twitterClient = new TwitterClient({
+        apiKey: config.apiKey ?? '',
+        apiSecret: config.apiSecret ?? '',
+        accessToken: config.accessToken,
+        accessTokenSecret: config.accessTokenSecret,
+      });
+    } catch (error) {
+      this.logger.error('Failed to initialize twitter service');
+      console.error(error);
+    }
   }
 
   async search(query: string): Promise<Tweet[]> {
