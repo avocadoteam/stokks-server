@@ -7,7 +7,7 @@ import { TwitterClient } from 'twitter-api-client';
 @Injectable()
 export class TwitterApiService {
   private readonly logger = new Logger(TwitterApiService.name);
-  twitterClient: TwitterClient;
+  private readonly twitterClient: TwitterClient;
   constructor(
     @Inject(twitterConfig.KEY)
     private readonly config: ConfigType<typeof twitterConfig>,

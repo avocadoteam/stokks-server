@@ -6,7 +6,7 @@ import { cacheConfig } from './config/cache.config';
 import { coreConfig } from './config/core.config';
 import { dbConfig } from './config/db.config';
 import { twitterConfig } from './config/twitter.config';
-import { FaSearchModule } from './fa-search/fa-search.module';
+import { StocksModule } from './stocks/stocks.module';
 import { RedisCacheModule } from './redis-cache/redis-cache.module';
 import { TwitterApiModule } from './twitter-api/twitter-api.module';
 import { UrlParserModule } from './url-parser/url-parser.module';
@@ -45,7 +45,7 @@ import { YahooApiModule } from './yahoo-api/yahoo-api.module';
       inject: [ConfigService],
     }),
     RedisCacheModule,
-    FaSearchModule,
+    StocksModule,
     YahooApiModule,
     TwitterApiModule,
     UrlParserModule,

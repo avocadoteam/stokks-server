@@ -1,4 +1,4 @@
-import { HistoryPeriodTarget, NewsItem, SymbolGeneralInfo, YahooSearchResult } from '@models';
+import { HistoricalRow, HistoryPeriodTarget, NewsItem, SymbolGeneralInfo, YahooSearchResult } from '@models';
 import { Injectable } from '@nestjs/common';
 import * as moment from 'moment';
 import yahooFinance from 'yahoo-finance2';
@@ -59,7 +59,7 @@ export class YahooApiService {
     };
   }
 
-  async getSymbolHistory(symbol: string, target: HistoryPeriodTarget) {
+  async getSymbolHistory(symbol: string, target: HistoryPeriodTarget): Promise<HistoricalRow[]> {
     const history = await yahooFinance.historical(symbol, this.getPeriodFromTarget(target));
     return history;
   }
