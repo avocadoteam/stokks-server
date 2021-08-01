@@ -10,7 +10,7 @@ export class UserStocksStore {
   stock_symbol_id: string;
 
   @Column()
-  user_account_id: string;
+  user_account_id: number;
 
   @OneToOne(() => UserAccount, ua => ua.userStocksStore)
   @JoinColumn({

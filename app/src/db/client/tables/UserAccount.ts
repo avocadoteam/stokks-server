@@ -7,7 +7,7 @@ import { UserStocksStore } from './UserStocksStore';
 })
 export class UserAccount {
   @PrimaryGeneratedColumn('increment', { type: 'int4', name: 'user_account_id' })
-  id: string;
+  id: number;
 
   @OneToOne(() => UserStocksStore, uss => uss.user)
   userStocksStore: UserStocksStore;

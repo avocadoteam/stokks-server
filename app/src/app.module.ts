@@ -11,6 +11,7 @@ import { RedisCacheModule } from './redis-cache/redis-cache.module';
 import { TwitterApiModule } from './twitter-api/twitter-api.module';
 import { UrlParserModule } from './url-parser/url-parser.module';
 import { YahooApiModule } from './yahoo-api/yahoo-api.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { YahooApiModule } from './yahoo-api/yahoo-api.module';
     YahooApiModule,
     TwitterApiModule,
     UrlParserModule,
+    UserModule,
   ],
   controllers: [AppController],
 })

@@ -98,6 +98,22 @@ export class YahooApiService {
     }));
   }
 
+  async getCombineInfo(symbols: string[]) {
+    const results = await (yahooFinance.quote(
+      symbols,
+      {
+        fields: ['regularMarketPrice', 'regularMarketChange', 'shortName'],
+      },
+      { validateResult: false },
+    ) as Promise<QuoteResponseArray>);
+    return results.map(r => ({
+      regularMarketChange: r.regularMarketChange ?? 0,
+      regularMarketPrice: r.regularMarketPrice ?? 0,
+      symbol: r.symbol,
+      shortname: r.shortName,
+    }));
+  }
+
   private getPeriodFromTarget(target: HistoryPeriodTarget): HistoricalOptions {
     switch (target) {
       case HistoryPeriodTarget.Week:

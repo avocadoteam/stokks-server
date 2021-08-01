@@ -4,7 +4,7 @@ import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/s
 import { TransformInterceptor } from 'src/interceptors/transform.interceptor';
 import { TwitterApiService } from 'src/twitter-api/twitter-api.service';
 import { YahooApiService } from 'src/yahoo-api/yahoo-api.service';
-import { SearchModel, SymbolHystoryModel, SymbolInfoModel, TrendingModel } from './dto/stocks.model';
+import { SearchDto, SymbolHystoryDto, SymbolInfoDto, TrendingDto } from './dto/stocks.dto';
 
 @ApiTags('Stocks information')
 @ApiResponse({ status: 400, description: 'You re sending shit' })
@@ -16,14 +16,14 @@ export class StocksController {
   @ApiResponse({ schema: { example: { data: 'YahooSearchResult[]' } }, status: 200 })
   @ApiQuery({ name: 'query', required: true })
   @Get('search')
-  searchAutoc(@Query() model: SearchModel) {
+  searchAutoc(@Query() model: SearchDto) {
     return this.ya.startSearch(model.query);
   }
 
   @ApiResponse({ schema: { example: { data: 'SymbolGeneralInfo' } }, status: 200 })
   @ApiQuery({ name: 'symbol', required: true })
   @Get('symbol/info')
-  getSymbolInfo(@Query() model: SymbolInfoModel) {
+  getSymbolInfo(@Query() model: SymbolInfoDto) {
     return this.ya.getSymbolInfo(model.symbol);
   }
 
@@ -38,14 +38,14 @@ export class StocksController {
     },
   })
   @Post('symbol/history')
-  getSymbolHistory(@Body() model: SymbolHystoryModel) {
+  getSymbolHistory(@Body() model: SymbolHystoryDto) {
     return this.ya.getSymbolHistory(model.symbol, model.target);
   }
 
   @ApiResponse({ schema: { example: { data: 'NewsItem[]' } }, status: 200, description: 'returns only 5 latest news' })
   @ApiQuery({ name: 'query', required: true })
   @Get('symbol/news')
-  getNews(@Query() model: SearchModel) {
+  getNews(@Query() model: SearchDto) {
     return this.ya.getLatestNews(model.query);
   }
 
@@ -53,7 +53,7 @@ export class StocksController {
   @ApiResponse({ schema: { example: { data: 'Tweet[]' } }, status: 200 })
   @ApiQuery({ name: 'query', required: true })
   @Get('symbol/tweets')
-  getRecentTweets(@Query() model: SearchModel) {
+  getRecentTweets(@Query() model: SearchDto) {
     return this.tw.search(model.query);
   }
 
@@ -67,7 +67,7 @@ export class StocksController {
     },
   })
   @Post('symbol/trending')
-  getTrendingSymbols(@Body() model: TrendingModel) {
+  getTrendingSymbols(@Body() model: TrendingDto) {
     return this.ya.getTrendingSymbols(model.count);
   }
 }

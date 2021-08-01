@@ -7,7 +7,7 @@ import { UserAccount } from './UserAccount';
 })
 export class UserNotification {
   @PrimaryGeneratedColumn('increment', { type: 'int4', name: 'user_notification_id' })
-  id: string;
+  id: number;
 
   @Column({
     type: 'int4',
