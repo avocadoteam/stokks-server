@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "heroku-prebuild": "yarn build:server",
-    "build:server": "ls -a && cd app && yarn && yarn build && cd dist && ls -a"
+    "build:server": "cd app && yarn && yarn build"
   },
   "repository": {
     "type": "git",
