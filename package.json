@@ -1,0 +1,16 @@
+{
+  "name": "stokks-server",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "heroku-prebuild": "yarn build:server",
+    "build:server": "cd app && yarn && yarn build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/woophi/stokks-server"
+  },
+  "engines": {
+    "yarn": "1.22.x"
+  }
+}
