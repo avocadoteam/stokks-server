@@ -12,6 +12,6 @@ export class UserAccount {
   @OneToOne(() => UserStocksStore, uss => uss.user)
   userStocksStore: UserStocksStore;
 
-  @OneToMany(() => UserNotification, un => un.userAccount)
+  @OneToMany(() => UserNotification, un => un.user)
   notifications: UserNotification[];
 }

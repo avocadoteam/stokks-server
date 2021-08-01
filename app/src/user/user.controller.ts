@@ -1,20 +1,21 @@
 import { NotificationIntervalTarget } from '@models';
 import {
   Body,
+  ConflictException,
   Controller,
   Delete,
   Get,
   HttpStatus,
   NotFoundException,
+  Param,
   ParseIntPipe,
   Post,
   Put,
-  Query,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBody, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { TransformInterceptor } from 'src/interceptors/transform.interceptor';
-import { UserDeleteStoreDto, UserNotificationDto, UserStoreDto } from './dto/user.dto';
+import { UserDeleteStoreDto, UserNotificationDto, UserNotificationUpdateDto, UserStoreDto } from './dto/user.dto';
 import { UserService } from './user.service';
 
 @ApiTags('User operations')
@@ -43,21 +44,16 @@ export class UserController {
   })
   @Put('store')
   async addToUserStore(@Body() model: UserStoreDto) {
-    if (!this.us.hasUser(model.userId)) {
-      throw new NotFoundException();
-    }
+    await this.checkUser(model.userId);
 
     await this.us.fillTheStore(model.userId, model.symbol);
   }
 
   @ApiResponse({ schema: { example: { data: 'UserStoreItem[]' } }, status: 200 })
   @ApiResponse({ status: 404, description: 'User or store not found' })
-  @ApiQuery({ name: 'userId', required: true })
   @Get('store')
-  async getUserStore(@Query('userId', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.BAD_REQUEST })) userId: number) {
-    if (!this.us.hasUser(userId)) {
-      throw new NotFoundException();
-    }
+  async getUserStore(@Param('userId', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.BAD_REQUEST })) userId: number) {
+    await this.checkUser(userId);
 
     return this.us.getUserStore(userId);
   }
@@ -75,9 +71,8 @@ export class UserController {
   })
   @Delete('store')
   async deleteFromUserStore(@Body() model: UserDeleteStoreDto) {
-    if (!this.us.hasUser(model.userId)) {
-      throw new NotFoundException();
-    }
+    await this.checkUser(model.userId);
+
     await this.us.deleteFromTheStore(model.userId, model.symbolId);
   }
 
@@ -94,12 +89,58 @@ export class UserController {
       },
     },
   })
+  @ApiResponse({ schema: { example: { data: 'number' } }, status: 200 })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 409, description: 'Notification has already been created' })
   @Post('notification')
-  createNotification(@Body() model: UserNotificationDto) {
-    if (!this.us.hasUser(model.userId)) {
-      throw new NotFoundException();
+  async createNotification(@Body() model: UserNotificationDto) {
+    await this.checkUser(model.userId);
+
+    if (await this.us.hasUserNotification(model.userId, model.symbol)) {
+      throw new ConflictException();
     }
 
     return this.us.createNotification(model);
+  }
+
+  @ApiResponse({ schema: { example: { data: 'UserNotificationInfo' } }, status: 200 })
+  @ApiResponse({ status: 404, description: 'User or notification not found' })
+  @Get(':userId/notification/:id')
+  async getNotification(
+    @Param('userId', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.BAD_REQUEST })) userId: number,
+    @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.BAD_REQUEST })) notificationId: number,
+  ) {
+    await this.checkUser(userId);
+
+    return this.us.getNotification(userId, notificationId);
+  }
+
+  @ApiResponse({ schema: { example: { data: 'UserNotificationInfo' } }, status: 200 })
+  @ApiResponse({ status: 404, description: 'User or notification not found' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        priceMatch: { type: 'number' },
+        target: { type: 'enum', enum: [NotificationIntervalTarget] },
+        delete: { type: 'boolean' },
+      },
+    },
+  })
+  @Put(':userId/notification/:id')
+  async updateNotification(
+    @Param('userId', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.BAD_REQUEST })) userId: number,
+    @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.BAD_REQUEST })) notificationId: number,
+    @Body() model: UserNotificationUpdateDto,
+  ) {
+    await this.checkUser(userId);
+
+    return this.us.updateNotification(notificationId, model);
+  }
+
+  private async checkUser(userId: number) {
+    if (!(await this.us.hasUser(userId))) {
+      throw new NotFoundException();
+    }
   }
 }

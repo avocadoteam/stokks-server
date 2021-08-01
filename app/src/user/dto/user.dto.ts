@@ -1,5 +1,11 @@
-import { NotificationIntervalTarget, UserDeleteStoreModel, UserNotificationModel, UserStoreModel } from '@models';
-import { IsEnum, IsNumber, IsString } from 'class-validator';
+import {
+  NotificationIntervalTarget,
+  UserDeleteStoreModel,
+  UserNotificationModel,
+  UserNotificationUpdateModel,
+  UserStoreModel,
+} from '@models';
+import { IsBoolean, IsEnum, IsNumber, IsString } from 'class-validator';
 import { IsNotBlank } from 'src/interceptors/exts/isBlank';
 
 export class UserStoreDto implements UserStoreModel {
@@ -32,4 +38,15 @@ export class UserNotificationDto implements UserNotificationModel {
 
   @IsNumber()
   priceMatch: number;
+}
+
+export class UserNotificationUpdateDto implements UserNotificationUpdateModel {
+  @IsEnum(NotificationIntervalTarget)
+  target: NotificationIntervalTarget;
+
+  @IsNumber()
+  priceMatch: number;
+
+  @IsBoolean()
+  delete: boolean;
 }

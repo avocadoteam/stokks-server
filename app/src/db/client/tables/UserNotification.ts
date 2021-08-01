@@ -36,5 +36,5 @@ export class UserNotification {
   @JoinColumn({
     name: 'user_account_id',
   })
-  userAccount: UserAccount;
+  user: UserAccount;
 }

@@ -1,4 +1,4 @@
-import { UserNotificationModel, UserStoreItem } from '@models';
+import { UserNotificationInfo, UserNotificationModel, UserNotificationUpdateModel, UserStoreItem } from '@models';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { StockSymbol } from 'src/db/client/tables/StockSymbol';
@@ -39,6 +39,19 @@ export class UserService {
   async hasUser(userId: number) {
     return (await this.ua.count({ where: { id: userId } })) > 0;
   }
+
+  async hasUserNotification(userId: number, symbol: string) {
+    return (
+      (await this.un
+        .createQueryBuilder('un')
+        .innerJoin('un.user', 'ua', 'ua.id = :userId', { userId })
+        .innerJoin('un.stockSymbol', 'symbol', 'symbol.name = :symbol and symbol.deleted is null', {
+          symbol: symbol.toLowerCase(),
+        })
+        .getCount()) > 0
+    );
+  }
+
   async getUserStore(userId: number): Promise<UserStoreItem[]> {
     const store = await this.uss
       .createQueryBuilder('uss')
@@ -97,7 +110,7 @@ export class UserService {
       {
         deleted: IsNull(),
         stockSymbol: { id: symbolId },
-        userAccount: { id: userId },
+        user: { id: userId },
       },
       { deleted: now() },
     );
@@ -126,7 +139,7 @@ export class UserService {
       newNotification.notifyInterval = target;
       newNotification.priceMatch = priceMatch;
       newNotification.stockSymbol = stockSymbolId as unknown as StockSymbol;
-      newNotification.userAccount = userId as unknown as UserAccount;
+      newNotification.user = userId as unknown as UserAccount;
 
       await qr.manager.save(newNotification);
 
@@ -136,5 +149,57 @@ export class UserService {
     });
 
     return notificationId;
+  }
+
+  async getNotification(userId: number, notificationId: number): Promise<UserNotificationInfo> {
+    const notification = await this.un
+      .createQueryBuilder('un')
+      .innerJoin('un.user', 'ua', 'ua.id = :userId', { userId })
+      .where('un.id = :notificationId', {
+        notificationId,
+      })
+      .getOne();
+
+    if (!notification) {
+      throw new NotFoundException();
+    }
+
+    return {
+      deleted: notification.deleted,
+      id: notification.id,
+      notifyInterval: notification.notifyInterval,
+      priceMatch: notification.priceMatch,
+    };
+  }
+
+  async updateNotification(notificationId: number, data: UserNotificationUpdateModel): Promise<UserNotificationInfo> {
+    const notification = await autoRetryTransaction(this.connection, async qr => {
+      const notif = await qr.manager.findOne(UserNotification, notificationId);
+
+      if (!notif) {
+        return null;
+      }
+
+      notif.notifyInterval = data.target;
+      notif.priceMatch = data.priceMatch;
+      notif.deleted = data.delete ? now() : null;
+
+      await qr.manager.save(notif);
+
+      await qr.commitTransaction();
+
+      return notif;
+    });
+
+    if (!notification) {
+      throw new NotFoundException();
+    }
+
+    return {
+      deleted: notification.deleted,
+      id: notification.id,
+      notifyInterval: notification.notifyInterval,
+      priceMatch: notification.priceMatch,
+    };
   }
 }
