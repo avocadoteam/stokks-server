@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "heroku-prebuild": "yarn build:server",
-    "build:server": "cat ./stokks-models/twitter/search.ts && cd app && yarn && yarn build"
+    "build:server": "ls -a && cd app && yarn && yarn build"
   },
   "repository": {
     "type": "git",
