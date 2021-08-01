@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "heroku-prebuild": "yarn build:server",
-    "build:server": "cd app && yarn && yarn build"
+    "build:server": "git pull --recurse-submodules && cd app && yarn && yarn build"
   },
   "repository": {
     "type": "git",
