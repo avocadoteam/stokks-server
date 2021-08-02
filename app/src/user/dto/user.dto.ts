@@ -34,7 +34,7 @@ export class UserNotificationDto implements UserNotificationModel {
   symbol: string;
 
   @IsEnum(NotificationIntervalTarget)
-  target: NotificationIntervalTarget;
+  notifyInterval: NotificationIntervalTarget;
 
   @IsNumber()
   priceMatch: number;
@@ -42,7 +42,7 @@ export class UserNotificationDto implements UserNotificationModel {
 
 export class UserNotificationUpdateDto implements UserNotificationUpdateModel {
   @IsEnum(NotificationIntervalTarget)
-  target: NotificationIntervalTarget;
+  notifyInterval: NotificationIntervalTarget;
 
   @IsNumber()
   priceMatch: number;

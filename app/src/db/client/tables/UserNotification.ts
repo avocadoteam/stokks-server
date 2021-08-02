@@ -1,3 +1,4 @@
+import { NotificationIntervalTarget } from '@models';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { StockSymbol } from './StockSymbol';
 import { UserAccount } from './UserAccount';
@@ -18,7 +19,7 @@ export class UserNotification {
     type: 'interval',
     name: 'notify_interval',
   })
-  notifyInterval: string;
+  notifyInterval: NotificationIntervalTarget;
 
   @Column({
     type: 'timestamp',

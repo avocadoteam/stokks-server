@@ -85,7 +85,7 @@ export class UserController {
         symbol: { type: 'string' },
         userId: { type: 'number' },
         priceMatch: { type: 'number' },
-        target: { type: 'enum', enum: [NotificationIntervalTarget] },
+        notifyInterval: { type: 'enum', enum: [NotificationIntervalTarget] },
       },
     },
   })
@@ -122,7 +122,7 @@ export class UserController {
       type: 'object',
       properties: {
         priceMatch: { type: 'number' },
-        target: { type: 'enum', enum: [NotificationIntervalTarget] },
+        notifyInterval: { type: 'enum', enum: [NotificationIntervalTarget] },
         delete: { type: 'boolean' },
       },
     },
@@ -135,7 +135,7 @@ export class UserController {
   ) {
     await this.checkUser(userId);
 
-    return this.us.updateNotification(notificationId, model);
+    return this.us.updateNotification(userId, notificationId, model);
   }
 
   private async checkUser(userId: number) {

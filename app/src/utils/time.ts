@@ -1,8 +1,7 @@
 import * as moment from 'moment';
 
 export const now = () => moment().toDate();
-export const nowAdd = (amount?: moment.DurationInputArg1, unit?: moment.DurationInputArg2) =>
-  moment().add(amount, unit).toDate();
+export const nowAdd = (amount?: moment.DurationInputArg1, unit?: moment.DurationInputArg2) => moment().add(amount, unit);
 export const nowRemove = (amount?: moment.DurationInputArg1, unit?: moment.DurationInputArg2) =>
   moment().subtract(amount, unit).toDate();
 
