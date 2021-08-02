@@ -43,7 +43,7 @@ export class NotificationProcessor {
     const data = await this.ya.getSymbolInfo(notification.stockSymbol.name);
 
     if (resolveCondition(data.regularMarketPrice, Number(notification.triggerValue), notification.triggerParam)) {
-      // send notification to client
+      this.logger.log('send notification to client');
     }
     EventBus.emit(BusEvent.UserChangedNotification, {
       deleted: notification.deleted,
