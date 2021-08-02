@@ -1,7 +1,7 @@
 import { CacheModule, CACHE_MANAGER, Global, Inject, Injectable, Logger, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as redisStore from 'cache-manager-redis-store';
-import { HashSample } from 'src/contracts/redis-cache';
+import { HashUrlParser } from 'src/contracts/redis-cache';
 import { CacheManager } from 'src/custom-types/cache';
 import { JsKey } from 'src/custom-types/js-specific';
 
@@ -89,7 +89,7 @@ const redisConnection = CacheModule.registerAsync({
 export class RedisCacheModule {}
 
 export type HashValue = {
-  [HashSample.Sample]: string;
+  [HashUrlParser.ParsedArticles]: string;
 };
 
-type HashKeys = HashSample;
+type HashKeys = HashUrlParser;

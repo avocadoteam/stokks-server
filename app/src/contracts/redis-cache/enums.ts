@@ -1,3 +1,3 @@
-export enum HashSample {
-  Sample = 'sample',
+export enum HashUrlParser {
+  ParsedArticles = 'parsed_articles',
 }
