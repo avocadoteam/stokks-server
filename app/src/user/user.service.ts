@@ -1,4 +1,10 @@
-import { UserNotificationInfo, UserNotificationModel, UserNotificationUpdateModel, UserStoreItem } from '@models';
+import {
+  TriggerName,
+  UserNotificationInfo,
+  UserNotificationModel,
+  UserNotificationUpdateModel,
+  UserStoreItem,
+} from '@models';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BusEvent } from 'src/contracts/events/bus';
@@ -118,7 +124,7 @@ export class UserService {
     );
   }
 
-  async createNotification({ symbol, notifyInterval, priceMatch, userId }: UserNotificationModel) {
+  async createNotification({ symbol, notifyInterval, triggerParam, triggerValue, userId }: UserNotificationModel) {
     const notification = await autoRetryTransaction(this.connection, async qr => {
       let stockSymbolId: string | null = null;
       const stockSymbol = await qr.manager.findOne(StockSymbol, {
@@ -139,7 +145,9 @@ export class UserService {
       const newNotification = new UserNotification();
 
       newNotification.notifyInterval = notifyInterval;
-      newNotification.priceMatch = priceMatch;
+      newNotification.triggerName = TriggerName.PriceMatch;
+      newNotification.triggerParam = triggerParam;
+      newNotification.triggerValue = triggerValue;
       newNotification.stockSymbol = stockSymbolId as unknown as StockSymbol;
       newNotification.user = userId as unknown as UserAccount;
 
@@ -154,8 +162,6 @@ export class UserService {
       deleted: notification.deleted,
       id: notification.id,
       notifyInterval: notification.notifyInterval,
-      priceMatch: notification.priceMatch,
-      userId,
     });
 
     return notification.id;
@@ -178,15 +184,13 @@ export class UserService {
       deleted: notification.deleted,
       id: notification.id,
       notifyInterval: notification.notifyInterval,
-      priceMatch: notification.priceMatch,
+      triggerName: notification.triggerName,
+      triggerParam: notification.triggerParam,
+      triggerValue: notification.triggerValue,
     };
   }
 
-  async updateNotification(
-    userId: number,
-    notificationId: number,
-    data: UserNotificationUpdateModel,
-  ): Promise<UserNotificationInfo> {
+  async updateNotification(notificationId: number, data: UserNotificationUpdateModel): Promise<UserNotificationInfo> {
     const notification = await autoRetryTransaction(this.connection, async qr => {
       const notif = await qr.manager.findOne(UserNotification, notificationId);
 
@@ -195,7 +199,8 @@ export class UserService {
       }
 
       notif.notifyInterval = data.notifyInterval;
-      notif.priceMatch = data.priceMatch;
+      notif.triggerParam = data.triggerParam;
+      notif.triggerValue = data.triggerValue;
       notif.deleted = data.delete ? now() : null;
 
       await qr.manager.save(notif);
@@ -213,15 +218,15 @@ export class UserService {
       deleted: notification.deleted,
       id: notification.id,
       notifyInterval: notification.notifyInterval,
-      priceMatch: notification.priceMatch,
-      userId,
     });
 
     return {
       deleted: notification.deleted,
       id: notification.id,
       notifyInterval: notification.notifyInterval,
-      priceMatch: notification.priceMatch,
+      triggerName: notification.triggerName,
+      triggerParam: notification.triggerParam,
+      triggerValue: notification.triggerValue,
     };
   }
 }

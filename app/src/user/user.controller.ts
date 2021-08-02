@@ -1,4 +1,4 @@
-import { NotificationIntervalTarget } from '@models';
+import { NotificationIntervalTarget, TriggerParam } from '@models';
 import {
   Body,
   ConflictException,
@@ -84,7 +84,8 @@ export class UserController {
       properties: {
         symbol: { type: 'string' },
         userId: { type: 'number' },
-        priceMatch: { type: 'number' },
+        triggerParam: { type: 'enum', enum: [TriggerParam] },
+        triggerValue: { type: 'string' },
         notifyInterval: { type: 'enum', enum: [NotificationIntervalTarget] },
       },
     },
@@ -121,7 +122,8 @@ export class UserController {
     schema: {
       type: 'object',
       properties: {
-        priceMatch: { type: 'number' },
+        triggerParam: { type: 'enum', enum: [TriggerParam] },
+        triggerValue: { type: 'string' },
         notifyInterval: { type: 'enum', enum: [NotificationIntervalTarget] },
         delete: { type: 'boolean' },
       },
@@ -135,7 +137,7 @@ export class UserController {
   ) {
     await this.checkUser(userId);
 
-    return this.us.updateNotification(userId, notificationId, model);
+    return this.us.updateNotification(notificationId, model);
   }
 
   private async checkUser(userId: number) {

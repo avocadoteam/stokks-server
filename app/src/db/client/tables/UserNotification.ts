@@ -1,4 +1,4 @@
-import { NotificationIntervalTarget } from '@models';
+import { NotificationIntervalTarget, TriggerName, TriggerParam } from '@models';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { StockSymbol } from './StockSymbol';
 import { UserAccount } from './UserAccount';
@@ -11,10 +11,25 @@ export class UserNotification {
   id: number;
 
   @Column({
-    type: 'int4',
-    name: 'price_match',
+    type: 'varchar',
+    name: 'trigger_name',
+    length: 64,
   })
-  priceMatch: number;
+  triggerName: TriggerName;
+
+  @Column({
+    type: 'varchar',
+    name: 'trigger_param',
+    length: 2,
+  })
+  triggerParam: TriggerParam;
+
+  @Column({
+    type: 'text',
+    name: 'trigger_value',
+  })
+  triggerValue: string;
+
   @Column({
     type: 'interval',
     name: 'notify_interval',

@@ -18,7 +18,9 @@ create table user_stocks_store (
 
 create table user_notification (
   user_notification_id serial,
-  price_match int4 not null,
+  trigger_name varchar(64) not null,
+  trigger_param varchar(2) not null,
+  trigger_value text not null,
   notify_interval interval not null,
   stock_symbol_id int8 not null,
   user_account_id int4 not null,

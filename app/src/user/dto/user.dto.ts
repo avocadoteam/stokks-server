@@ -1,5 +1,6 @@
 import {
   NotificationIntervalTarget,
+  TriggerParam,
   UserDeleteStoreModel,
   UserNotificationModel,
   UserNotificationUpdateModel,
@@ -36,17 +37,25 @@ export class UserNotificationDto implements UserNotificationModel {
   @IsEnum(NotificationIntervalTarget)
   notifyInterval: NotificationIntervalTarget;
 
-  @IsNumber()
-  priceMatch: number;
+  @IsEnum(TriggerParam)
+  triggerParam: TriggerParam;
+
+  @IsString()
+  @IsNotBlank()
+  triggerValue: string;
 }
 
 export class UserNotificationUpdateDto implements UserNotificationUpdateModel {
   @IsEnum(NotificationIntervalTarget)
   notifyInterval: NotificationIntervalTarget;
 
-  @IsNumber()
-  priceMatch: number;
-
   @IsBoolean()
   delete: boolean;
+
+  @IsEnum(TriggerParam)
+  triggerParam: TriggerParam;
+
+  @IsString()
+  @IsNotBlank()
+  triggerValue: string;
 }
