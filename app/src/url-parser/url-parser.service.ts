@@ -26,6 +26,8 @@ export class UrlParserService {
       };
     });
 
+    browser.close();
+
     return result;
   }
 }
