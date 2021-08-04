@@ -15,7 +15,13 @@ import {
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { TransformInterceptor } from 'src/interceptors/transform.interceptor';
-import { UserDeleteStoreDto, UserNotificationDto, UserNotificationUpdateDto, UserStoreDto } from './dto/user.dto';
+import {
+  UserCreateDto,
+  UserDeleteStoreDto,
+  UserNotificationDto,
+  UserNotificationUpdateDto,
+  UserStoreDto,
+} from './dto/user.dto';
 import { UserService } from './user.service';
 
 @ApiTags('User operations')
@@ -26,9 +32,17 @@ export class UserController {
   constructor(private readonly us: UserService) {}
 
   @ApiResponse({ schema: { example: { data: 'number' } }, status: 200 })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        password: { type: 'string', maxLength: 100, minLength: 8 },
+      },
+    },
+  })
   @Post()
-  createUser() {
-    return this.us.createUser();
+  createUser(@Body() model: UserCreateDto) {
+    return this.us.createUser(model.password);
   }
 
   @ApiResponse({ status: 201 })

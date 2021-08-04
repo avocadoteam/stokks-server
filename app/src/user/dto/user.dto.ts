@@ -1,12 +1,13 @@
 import {
   NotificationIntervalTarget,
   TriggerParam,
+  UserCreateModel,
   UserDeleteStoreModel,
   UserNotificationModel,
   UserNotificationUpdateModel,
   UserStoreModel,
 } from '@models';
-import { IsBoolean, IsEnum, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsNumber, IsString, MaxLength, MinLength } from 'class-validator';
 import { IsNotBlank } from 'src/interceptors/exts/isBlank';
 
 export class UserStoreDto implements UserStoreModel {
@@ -16,6 +17,13 @@ export class UserStoreDto implements UserStoreModel {
   @IsString()
   @IsNotBlank()
   symbol: string;
+}
+export class UserCreateDto implements UserCreateModel {
+  @IsString()
+  @IsNotBlank()
+  @MinLength(8)
+  @MaxLength(100)
+  password: string;
 }
 export class UserDeleteStoreDto implements UserDeleteStoreModel {
   @IsNumber()

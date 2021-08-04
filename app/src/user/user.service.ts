@@ -7,6 +7,7 @@ import {
 } from '@models';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { genSalt, hash } from 'bcrypt';
 import { BusEvent } from 'src/contracts/events/bus';
 import { StockSymbol } from 'src/db/client/tables/StockSymbol';
 import { UserAccount } from 'src/db/client/tables/UserAccount';
@@ -31,9 +32,15 @@ export class UserService {
     private readonly ya: YahooApiService,
   ) {}
 
-  async createUser() {
+  async createUser(password: string) {
     const userId = await autoRetryTransaction(this.connection, async qr => {
       const newUser = new UserAccount();
+
+      const passSalt = await genSalt();
+      const passHash = await hash(password, passSalt);
+
+      newUser.passHash = passHash as any;
+      newUser.passSalt = passSalt as any;
 
       await qr.manager.save(newUser);
 

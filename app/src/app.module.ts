@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
+import { AuthModule } from './auth/auth.module';
 import { cacheConfig } from './config/cache.config';
 import { coreConfig } from './config/core.config';
 import { dbConfig } from './config/db.config';
@@ -76,6 +77,7 @@ import { YahooApiModule } from './yahoo-api/yahoo-api.module';
     TwitterApiModule,
     UrlParserModule,
     UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
 })
