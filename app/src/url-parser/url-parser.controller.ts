@@ -1,11 +1,13 @@
-import { Body, Controller, Post, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { TransformInterceptor } from 'src/interceptors/transform.interceptor';
 import { UrlParserDto } from './dto/url-parser.model';
 import { UrlParserService } from './url-parser.service';
 
 @ApiTags('Url parse')
 @Controller('api/url-parse')
+@UseGuards(JwtAuthGuard)
 @UseInterceptors(TransformInterceptor)
 export class UrlParserController {
   constructor(private readonly up: UrlParserService) {}
