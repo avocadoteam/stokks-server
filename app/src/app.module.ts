@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { cacheConfig } from './config/cache.config';
 import { coreConfig } from './config/core.config';
 import { dbConfig } from './config/db.config';
+import { jwtConfig } from './config/jwt.config';
 import { twitterConfig } from './config/twitter.config';
 import { RedisCacheModule } from './redis-cache/redis-cache.module';
 import { StocksModule } from './stocks/stocks.module';
@@ -20,7 +21,7 @@ import { YahooApiModule } from './yahoo-api/yahoo-api.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [dbConfig, cacheConfig, coreConfig, twitterConfig],
+      load: [dbConfig, cacheConfig, coreConfig, twitterConfig, jwtConfig],
       isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
