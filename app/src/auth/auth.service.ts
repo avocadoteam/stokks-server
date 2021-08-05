@@ -15,7 +15,7 @@ export class AuthService {
   ) {}
 
   async validateUser(userId: number, pass: string) {
-    this.logger.debug('Looking for user');
+    this.logger.debug(`Looking for user ${userId}`);
     const user = await this.ua.findOne(userId);
     if (user) {
       this.logger.debug('Got user');
