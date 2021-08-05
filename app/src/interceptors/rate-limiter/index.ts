@@ -26,7 +26,7 @@ export class FetchLimiter implements NestMiddleware {
         enable_offline_queue: false,
         ...connection,
       }),
-      points: 1, // Number of points
+      points: 4, // Number of points
       duration: 1, // Per second(s)
       keyPrefix: 'rlflx', // must be unique for limiters with different purpose
       execEvenly: true,
@@ -35,8 +35,8 @@ export class FetchLimiter implements NestMiddleware {
 
   async use(req: Request, res: Response, next: () => void) {
     try {
-      const vkUserId = req.query['vk_user_id'] ?? 0;
-      await this.limiter.consume(`p_${req.path}_ip_${req.ip}_vk_${vkUserId}`);
+      const userId = req.query['userId'] ?? req.body['userId'] ?? 0;
+      await this.limiter.consume(`p_${req.path}_ip_${req.ip}_u_${userId}`);
       return next();
     } catch (rateLimiterRes) {
       const error = `You've made too many attempts in a short period of time, please try again at ${moment()
