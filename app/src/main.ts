@@ -22,7 +22,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(new TimeoutInterceptor());
   app.useStaticAssets(join(__dirname, '../../..', 'public'));
 
-  const config = new DocumentBuilder().setTitle('Stokks api').setVersion('1.0').build();
+  const config = new DocumentBuilder().setTitle('Stokks api').setVersion('1.0').addBearerAuth().build();
   const document = SwaggerModule.createDocument(app, config, {});
   SwaggerModule.setup('api', app, document);
 

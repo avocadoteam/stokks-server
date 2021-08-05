@@ -14,7 +14,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { TransformInterceptor } from 'src/interceptors/transform.interceptor';
 import {
@@ -30,6 +30,7 @@ import { UserService } from './user.service';
 @ApiResponse({ status: 400, description: 'You re sending shit' })
 @Controller('api/user')
 @UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 @UseInterceptors(TransformInterceptor)
 export class UserController {
   constructor(private readonly us: UserService) {}

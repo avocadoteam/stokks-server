@@ -1,6 +1,6 @@
 import { HistoryPeriodTarget } from '@models';
 import { Body, Controller, Get, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { TransformInterceptor } from 'src/interceptors/transform.interceptor';
 import { TwitterApiService } from 'src/twitter-api/twitter-api.service';
@@ -10,6 +10,7 @@ import { SearchDto, SymbolHystoryDto, SymbolInfoDto, TrendingDto } from './dto/s
 @ApiTags('Stocks information')
 @ApiResponse({ status: 400, description: 'You re sending shit' })
 @Controller('api/stocks')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(TransformInterceptor)
 export class StocksController {
