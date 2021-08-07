@@ -29,7 +29,6 @@ import { UserService } from './user.service';
 @ApiTags('User operations')
 @ApiResponse({ status: 400, description: 'You re sending shit' })
 @Controller('api/user')
-@UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @UseInterceptors(TransformInterceptor)
 export class UserController {
@@ -60,6 +59,7 @@ export class UserController {
       },
     },
   })
+  @UseGuards(JwtAuthGuard)
   @Put('store')
   async addToUserStore(@Body() model: UserStoreDto) {
     await this.checkUser(model.userId);
@@ -69,7 +69,7 @@ export class UserController {
 
   @ApiResponse({ schema: { example: { data: 'UserStoreItem[]' } }, status: 200 })
   @ApiResponse({ status: 404, description: 'User or store not found' })
-  @Get('store')
+  @Get(':userId/store')
   async getUserStore(@Param('userId', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.BAD_REQUEST })) userId: number) {
     await this.checkUser(userId);
 
@@ -87,6 +87,7 @@ export class UserController {
       },
     },
   })
+  @UseGuards(JwtAuthGuard)
   @Delete('store')
   async deleteFromUserStore(@Body() model: UserDeleteStoreDto) {
     await this.checkUser(model.userId);
@@ -111,6 +112,7 @@ export class UserController {
   @ApiResponse({ schema: { example: { data: 'number' } }, status: 200 })
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 409, description: 'Notification has already been created' })
+  @UseGuards(JwtAuthGuard)
   @Post('notification')
   async createNotification(@Body() model: UserNotificationDto) {
     await this.checkUser(model.userId);
@@ -124,6 +126,7 @@ export class UserController {
 
   @ApiResponse({ schema: { example: { data: 'UserNotificationInfo' } }, status: 200 })
   @ApiResponse({ status: 404, description: 'User or notification not found' })
+  @UseGuards(JwtAuthGuard)
   @Get(':userId/notification/:id')
   async getNotification(
     @Param('userId', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.BAD_REQUEST })) userId: number,
@@ -147,6 +150,7 @@ export class UserController {
       },
     },
   })
+  @UseGuards(JwtAuthGuard)
   @Put(':userId/notification/:id')
   async updateNotification(
     @Param('userId', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.BAD_REQUEST })) userId: number,

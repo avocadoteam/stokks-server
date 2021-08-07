@@ -75,7 +75,7 @@ export class UserService {
       .getMany();
 
     if (!store.length) {
-      throw new NotFoundException();
+      return [];
     }
 
     const symbols = store.map(s => s.stockSymbol.name);
