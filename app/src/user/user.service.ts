@@ -1,4 +1,5 @@
 import {
+  HistoryPeriodTarget,
   TriggerName,
   UserNotificationInfo,
   UserNotificationModel,
@@ -67,6 +68,7 @@ export class UserService {
     );
   }
 
+  // TODO: add cache
   async getUserStore(userId: number): Promise<UserStoreItem[]> {
     const store = await this.uss
       .createQueryBuilder('uss')
@@ -81,13 +83,27 @@ export class UserService {
     const symbols = store.map(s => s.stockSymbol.name);
 
     const data = await this.ya.getCombineInfo(symbols);
+    let resp: UserStoreItem[] = [];
 
-    return data
-      .map(d => ({
-        ...d,
-        symbolId: store.find(s => s.stockSymbol.name === d.symbol.toLowerCase())?.stock_symbol_id ?? '',
-      }))
-      .filter(d => !!d.symbolId);
+    for (const symbolInfo of data) {
+      try {
+        const history = await this.ya.getSymbolHistory(symbolInfo.symbol, HistoryPeriodTarget.Week);
+        resp.push({
+          ...symbolInfo,
+          history,
+          symbolId: store.find(s => s.stockSymbol.name === symbolInfo.symbol.toLowerCase())?.stock_symbol_id ?? '',
+        });
+      } catch (error) {
+        console.error(error);
+        resp.push({
+          ...symbolInfo,
+          history: [],
+          symbolId: store.find(s => s.stockSymbol.name === symbolInfo.symbol.toLowerCase())?.stock_symbol_id ?? '',
+        });
+      }
+    }
+
+    return resp.filter(d => !!d.symbolId);
   }
 
   async fillTheStore(userId: number, symbol: string) {

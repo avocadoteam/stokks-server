@@ -151,4 +151,46 @@ export class YahooApiService {
         };
     }
   }
+
+  private getHistory(symbol: string, target: HistoryPeriodTarget) {
+    const { interval, range } = this.getPeriodFromTarget2(target);
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${range}`;
+  }
+
+  private getPeriodFromTarget2(target: HistoryPeriodTarget) {
+    switch (target) {
+      case HistoryPeriodTarget.Week:
+        return {
+          interval: '15m',
+          range: '5d',
+        };
+      case HistoryPeriodTarget.Month:
+        return {
+          interval: '1h',
+          range: '1mo',
+        };
+      case HistoryPeriodTarget.Year:
+        return {
+          interval: '1wk',
+          range: '1y',
+        };
+      case HistoryPeriodTarget.FiveYears:
+        return {
+          interval: '1mo',
+          range: '5y',
+        };
+      case HistoryPeriodTarget.TenYears:
+        return {
+          interval: '1mo',
+          range: 'max',
+        };
+
+      case HistoryPeriodTarget.Day:
+      default:
+        return {
+          interval: '2m',
+          range: '1d',
+        };
+    }
+  }
 }

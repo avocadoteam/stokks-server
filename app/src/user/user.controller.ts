@@ -69,6 +69,7 @@ export class UserController {
 
   @ApiResponse({ schema: { example: { data: 'UserStoreItem[]' } }, status: 200 })
   @ApiResponse({ status: 404, description: 'User or store not found' })
+  @UseGuards(JwtAuthGuard)
   @Get(':userId/store')
   async getUserStore(@Param('userId', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.BAD_REQUEST })) userId: number) {
     await this.checkUser(userId);
