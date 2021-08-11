@@ -114,7 +114,7 @@ export class YahooApiService {
 
   async getHistory(symbol: string, target: HistoryPeriodTarget): Promise<HistoricalData> {
     const { interval, range } = this.getPeriodFromTarget2(target);
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${range}`;
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURI(symbol)}?interval=${interval}&range=${range}`;
     try {
       const { data } = await firstValueFrom(this.httpService.get<HistoryResponseModel>(url));
 
