@@ -30,7 +30,7 @@ export class StocksController {
     return this.ya.getSymbolInfo(model.symbol);
   }
 
-  @ApiResponse({ schema: { example: { data: 'HistoricalRow[]' } }, status: 200 })
+  @ApiResponse({ schema: { example: { data: 'HistoricalData' } }, status: 200 })
   @ApiBody({
     schema: {
       type: 'object',
@@ -42,7 +42,7 @@ export class StocksController {
   })
   @Post('symbol/history')
   getSymbolHistory(@Body() model: SymbolHystoryDto) {
-    return this.ya.getSymbolHistory(model.symbol, model.target);
+    return this.ya.getHistory(model.symbol, model.target);
   }
 
   @ApiResponse({ schema: { example: { data: 'NewsItem[]' } }, status: 200, description: 'returns only 5 latest news' })
