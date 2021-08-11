@@ -86,21 +86,12 @@ export class UserService {
     let resp: UserStoreItem[] = [];
 
     for (const symbolInfo of data) {
-      try {
-        const history = await this.ya.getSymbolHistory(symbolInfo.symbol, HistoryPeriodTarget.Week);
-        resp.push({
-          ...symbolInfo,
-          history,
-          symbolId: store.find(s => s.stockSymbol.name === symbolInfo.symbol.toLowerCase())?.stock_symbol_id ?? '',
-        });
-      } catch (error) {
-        console.error(error);
-        resp.push({
-          ...symbolInfo,
-          history: [],
-          symbolId: store.find(s => s.stockSymbol.name === symbolInfo.symbol.toLowerCase())?.stock_symbol_id ?? '',
-        });
-      }
+      const history = await this.ya.getHistory(symbolInfo.symbol, HistoryPeriodTarget.Week);
+      resp.push({
+        ...symbolInfo,
+        history,
+        symbolId: store.find(s => s.stockSymbol.name === symbolInfo.symbol.toLowerCase())?.stock_symbol_id ?? '',
+      });
     }
 
     return resp.filter(d => !!d.symbolId);

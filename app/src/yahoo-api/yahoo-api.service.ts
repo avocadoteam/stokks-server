@@ -1,12 +1,15 @@
-import { HistoricalRow, HistoryPeriodTarget, NewsItem, SymbolGeneralInfo, YahooSearchResult } from '@models';
+import { HistoricalData, HistoryPeriodTarget, NewsItem, SymbolGeneralInfo, YahooSearchResult } from '@models';
+import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
-import * as moment from 'moment';
+import { firstValueFrom } from 'rxjs';
+import { HistoryResponseModel } from 'src/contracts/yahoo';
 import yahooFinance from 'yahoo-finance2';
-import { HistoricalOptions } from 'yahoo-finance2/dist/esm/src/modules/historical';
 import { Quote, QuoteResponseArray } from 'yahoo-finance2/dist/esm/src/modules/quote';
 
 @Injectable()
 export class YahooApiService {
+  constructor(private readonly httpService: HttpService) {}
+
   async startSearch(query: string): Promise<YahooSearchResult[]> {
     const { Result: autocResults } = await yahooFinance.autoc(query);
 
@@ -59,11 +62,6 @@ export class YahooApiService {
     };
   }
 
-  async getSymbolHistory(symbol: string, target: HistoryPeriodTarget): Promise<HistoricalRow[]> {
-    const history = await yahooFinance.historical(symbol, this.getPeriodFromTarget(target));
-    return history;
-  }
-
   async getLatestNews(query: string): Promise<NewsItem[]> {
     const { news } = await yahooFinance.search(query, { newsCount: 5, quotesCount: 0 });
     return news.map(r => ({
@@ -114,47 +112,22 @@ export class YahooApiService {
     }));
   }
 
-  private getPeriodFromTarget(target: HistoryPeriodTarget): HistoricalOptions {
-    switch (target) {
-      case HistoryPeriodTarget.Week:
-        return {
-          period1: moment().subtract(1, 'week').format('YYYY-MM-DD'),
-          period2: moment().format('YYYY-MM-DD'),
-        };
-      case HistoryPeriodTarget.Month:
-        return {
-          period1: moment().subtract(1, 'month').format('YYYY-MM-DD'),
-          period2: moment().format('YYYY-MM-DD'),
-        };
-      case HistoryPeriodTarget.Year:
-        return {
-          period1: moment().subtract(1, 'year').format('YYYY-MM-DD'),
-          period2: moment().format('YYYY-MM-DD'),
-        };
-      case HistoryPeriodTarget.FiveYears:
-        return {
-          period1: moment().subtract(5, 'years').format('YYYY-MM-DD'),
-          period2: moment().format('YYYY-MM-DD'),
-          interval: '1mo',
-        };
-      case HistoryPeriodTarget.TenYears:
-        return {
-          period1: moment().subtract(10, 'years').format('YYYY-MM-DD'),
-          period2: moment().format('YYYY-MM-DD'),
-          interval: '1mo',
-        };
-
-      case HistoryPeriodTarget.Day:
-      default:
-        return {
-          period1: moment().format('YYYY-MM-DD'),
-        };
-    }
-  }
-
-  private getHistory(symbol: string, target: HistoryPeriodTarget) {
+  async getHistory(symbol: string, target: HistoryPeriodTarget): Promise<HistoricalData> {
     const { interval, range } = this.getPeriodFromTarget2(target);
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${range}`;
+    try {
+      const { data } = await firstValueFrom(this.httpService.get<HistoryResponseModel>(url));
+      return data.chart.result[0].indicators.quote[0];
+    } catch (error) {
+      console.error(error);
+      return {
+        close: [],
+        high: [],
+        low: [],
+        open: [],
+        volume: [],
+      };
+    }
   }
 
   private getPeriodFromTarget2(target: HistoryPeriodTarget) {
