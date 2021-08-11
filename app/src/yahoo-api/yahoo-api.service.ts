@@ -117,10 +117,15 @@ export class YahooApiService {
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${range}`;
     try {
       const { data } = await firstValueFrom(this.httpService.get<HistoryResponseModel>(url));
-      return data.chart.result[0].indicators.quote[0];
+
+      return {
+        ...data.chart.result[0].indicators.quote[0],
+        symbol,
+      };
     } catch (error) {
       console.error(error);
       return {
+        symbol,
         close: [],
         high: [],
         low: [],
