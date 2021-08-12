@@ -2,7 +2,7 @@ import { HistoricalData, HistoryPeriodTarget, NewsItem, SymbolGeneralInfo, Yahoo
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
-import { HistoryResponseModel } from 'src/contracts/yahoo';
+import { HistoryResponseModel, SearchResponseModel } from 'src/contracts/yahoo';
 import yahooFinance from 'yahoo-finance2';
 import { Quote, QuoteResponseArray } from 'yahoo-finance2/dist/esm/src/modules/quote';
 
@@ -11,9 +11,9 @@ export class YahooApiService {
   constructor(private readonly httpService: HttpService) {}
 
   async startSearch(query: string): Promise<YahooSearchResult[]> {
-    const { Result: autocResults } = await yahooFinance.autoc(query);
+    const autocResults = await this.yahooSearch(query);
 
-    const symbols = autocResults.map(r => r.symbol);
+    const symbols = autocResults?.quotes.map(r => r.symbol);
 
     if (!symbols?.length) {
       return [];
@@ -110,6 +110,20 @@ export class YahooApiService {
       symbol: r.symbol,
       shortname: r.shortName,
     }));
+  }
+
+  async yahooSearch(q: string): Promise<SearchResponseModel | null> {
+    const url = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURI(
+      q,
+    )}&quotesCount=8&newsCount=0&listsCount=0`;
+
+    try {
+      const { data } = await firstValueFrom(this.httpService.get<SearchResponseModel>(url));
+      return data;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
   }
 
   async getHistory(symbol: string, target: HistoryPeriodTarget): Promise<HistoricalData> {
