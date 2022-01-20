@@ -10,6 +10,12 @@ export class UserAccount {
   id: number;
 
   @Column({
+    type: 'varchar',
+    length: 256,
+  })
+  name?: string;
+
+  @Column({
     type: 'bytea',
     name: 'pass_hash',
   })

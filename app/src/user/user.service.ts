@@ -7,9 +7,11 @@ import {
   UserNotificationUpdateModel,
   UserStoreItem,
 } from '@models';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigType } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { genSalt, hash } from 'bcrypt';
+import { userConfig } from 'src/config/user.config';
 import { BusEvent } from 'src/contracts/events/bus';
 import { StockSymbol } from 'src/db/client/tables/StockSymbol';
 import { UserAccount } from 'src/db/client/tables/UserAccount';
@@ -32,9 +34,19 @@ export class UserService {
     private readonly un: Repository<UserNotification>,
     private readonly connection: Connection,
     private readonly ya: YahooApiService,
-  ) {}
+    @Inject(userConfig.KEY)
+    private readonly uConfig: ConfigType<typeof userConfig>,
+  ) {
+    if (!!uConfig.userName && !!uConfig.userPass) {
+      this.ua.count({ where: { name: uConfig.userName } }).then(r => {
+        if (!r) {
+          this.createUser(uConfig.userPass!, uConfig.userName);
+        }
+      });
+    }
+  }
 
-  async createUser(password: string) {
+  async createUser(password: string, name?: string) {
     const userId = await autoRetryTransaction(this.connection, async qr => {
       const newUser = new UserAccount();
 
@@ -43,6 +55,7 @@ export class UserService {
 
       newUser.passHash = passHash as any;
       newUser.passSalt = passSalt as any;
+      newUser.name = name;
 
       await qr.manager.save(newUser);
 

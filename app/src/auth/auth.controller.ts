@@ -13,7 +13,7 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  @ApiResponse({ schema: { example: { data: 'string' } }, status: 200 })
+  @ApiResponse({ schema: { example: { data: { token: 'string', userId: 'number' } } }, status: 200 })
   @ApiBody({
     schema: {
       type: 'object',

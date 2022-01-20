@@ -16,7 +16,13 @@ export class AuthService {
 
   async validateUser(userId: number, pass: string) {
     this.logger.debug(`Looking for user ${userId}`);
-    const user = await this.ua.findOne(userId);
+    let user: UserAccount | undefined;
+    if (typeof userId === 'string') {
+      user = await this.ua.findOne({ name: String(userId) });
+    } else {
+      user = await this.ua.findOne(userId);
+    }
+
     if (user) {
       this.logger.debug('Got user');
       const isMatch = await compare(pass, user.passHash.toString('utf8'));
@@ -34,6 +40,6 @@ export class AuthService {
 
   async login(user: { userId: number }) {
     const payload = { sub: user.userId };
-    return this.jwtService.sign(payload);
+    return { token: this.jwtService.sign(payload), userId: user.userId };
   }
 }
