@@ -33,7 +33,10 @@ export class NotificationService {
     const job = await this.queue.getJob(data.id);
     console.debug('updateQueue', job);
 
-    await job?.remove();
+    if (job) {
+      await job.moveToFailed({ message: 'Removed old job' }, true);
+      await job.remove();
+    }
     if (!!data.deleted) {
       return;
     }
