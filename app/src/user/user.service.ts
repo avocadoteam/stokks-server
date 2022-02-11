@@ -219,6 +219,21 @@ export class UserService {
       triggerValue: notification.triggerValue,
     };
   }
+  async getNotifications(userId: number): Promise<UserNotificationInfo[]> {
+    const notifications = await this.un
+      .createQueryBuilder('un')
+      .innerJoin('un.user', 'ua', 'ua.id = :userId', { userId })
+      .getMany();
+
+    return notifications.map(notification => ({
+      deleted: notification.deleted,
+      id: notification.id,
+      notifyInterval: notification.notifyInterval,
+      triggerName: notification.triggerName,
+      triggerParam: notification.triggerParam,
+      triggerValue: notification.triggerValue,
+    }));
+  }
 
   async updateNotification(notificationId: number, data: UserNotificationUpdateModel): Promise<UserNotificationInfo> {
     const notification = await autoRetryTransaction(this.connection, async qr => {

@@ -138,6 +138,18 @@ export class UserController {
     return this.us.getNotification(userId, notificationId);
   }
 
+  @ApiResponse({ schema: { example: { data: 'UserNotificationInfo[]' } }, status: 200 })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @UseGuards(JwtAuthGuard)
+  @Get(':userId/notifications')
+  async getNotifications(
+    @Param('userId', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.BAD_REQUEST })) userId: number,
+  ) {
+    await this.checkUser(userId);
+
+    return this.us.getNotifications(userId);
+  }
+
   @ApiResponse({ schema: { example: { data: 'UserNotificationInfo' } }, status: 200 })
   @ApiResponse({ status: 404, description: 'User or notification not found' })
   @ApiBody({
