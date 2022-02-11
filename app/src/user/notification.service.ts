@@ -23,6 +23,7 @@ export class NotificationService {
 
   private async addToQueue(data: UserNotificationEventModel) {
     const jobData: JobData[JobName.PriceNotification] = { notificationId: data.id };
+    console.debug('addToQueue', this.getDelay(data.notifyInterval), data.id);
     await this.queue.add(JobNames[QueueName.UserPriceNotification][JobName.PriceNotification], jobData, {
       delay: this.getDelay(data.notifyInterval),
       jobId: data.id,
@@ -30,6 +31,8 @@ export class NotificationService {
   }
   private async updateQueue(data: UserNotificationEventModel) {
     const job = await this.queue.getJob(data.id);
+    console.debug('updateQueue', job);
+
     await job?.remove();
     if (!!data.deleted) {
       return;

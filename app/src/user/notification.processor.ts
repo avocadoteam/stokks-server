@@ -45,6 +45,9 @@ export class NotificationProcessor {
     if (resolveCondition(data.regularMarketPrice, Number(notification.triggerValue), notification.triggerParam)) {
       this.logger.log('send notification to client');
     }
+    console.debug('notification.deleted', notification.deleted);
+    console.debug('notification.id', notification.id);
+    console.debug('notification.notifyInterval', notification.notifyInterval);
     EventBus.emit(BusEvent.UserChangedNotification, {
       deleted: notification.deleted,
       id: notification.id,
