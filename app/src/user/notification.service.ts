@@ -23,15 +23,13 @@ export class NotificationService {
 
   private async addToQueue(data: UserNotificationEventModel) {
     const jobData: JobData[JobName.PriceNotification] = { notificationId: data.id };
-    console.debug('addToQueue', this.getDelay(data.notifyInterval), data.id);
     await this.queue.add(JobNames[QueueName.UserPriceNotification][JobName.PriceNotification], jobData, {
-      delay: this.getDelay(data.notifyInterval),
+      delay: this.getDelay(this.convertNI(data.notifyInterval)),
       jobId: data.id,
     });
   }
   private async updateQueue(data: UserNotificationEventModel) {
     const job = await this.queue.getJob(data.id);
-    console.debug('updateQueue', job);
 
     if (job) {
       await job.moveToFailed({ message: 'Removed old job' }, true);
@@ -56,5 +54,18 @@ export class NotificationService {
       case NotificationIntervalTarget.Weekly:
         return weekInMs;
     }
+  }
+
+  private convertNI(interval: NotificationIntervalTarget | object) {
+    if (typeof interval !== 'object') return interval;
+
+    const { hours, days, months } = interval as { months: number; days: number; hours: number };
+    if (hours === 1) return NotificationIntervalTarget.EveryHour;
+    if (hours === 8) return NotificationIntervalTarget.Every8Hours;
+    if (days === 1) return NotificationIntervalTarget.Daily;
+    if (days === 7) return NotificationIntervalTarget.Weekly;
+    if (months === 1) return NotificationIntervalTarget.Monthly;
+
+    return NotificationIntervalTarget.EveryHour;
   }
 }
