@@ -219,20 +219,25 @@ export class UserService {
       triggerValue: notification.triggerValue,
     };
   }
-  async getNotifications(userId: number): Promise<UserNotificationInfo[]> {
-    const notifications = await this.un
+  async getNotificationBySymbolId(userId: number, symbolId: string): Promise<UserNotificationInfo> {
+    const notification = await this.un
       .createQueryBuilder('un')
       .innerJoin('un.user', 'ua', 'ua.id = :userId', { userId })
-      .getMany();
+      .innerJoin('un.stockSymbol', 'ss', 'ss.id = :symbolId', { symbolId })
+      .getOne();
 
-    return notifications.map(notification => ({
+    if (!notification) {
+      throw new NotFoundException();
+    }
+
+    return {
       deleted: notification.deleted,
       id: notification.id,
       notifyInterval: notification.notifyInterval,
       triggerName: notification.triggerName,
       triggerParam: notification.triggerParam,
       triggerValue: notification.triggerValue,
-    }));
+    };
   }
 
   async updateNotification(notificationId: number, data: UserNotificationUpdateModel): Promise<UserNotificationInfo> {

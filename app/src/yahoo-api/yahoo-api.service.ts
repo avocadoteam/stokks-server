@@ -1,14 +1,21 @@
 import { HistoricalData, HistoryPeriodTarget, NewsItem, SymbolGeneralInfo, YahooSearchResult } from '@models';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { firstValueFrom } from 'rxjs';
 import { HistoryResponseModel, SearchResponseModel } from 'src/contracts/yahoo';
+import { StockSymbol } from 'src/db/client/tables/StockSymbol';
+import { IsNull, Repository } from 'typeorm';
 import yahooFinance from 'yahoo-finance2';
 import { Quote, QuoteResponseArray } from 'yahoo-finance2/dist/esm/src/modules/quote';
 
 @Injectable()
 export class YahooApiService {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    @InjectRepository(StockSymbol)
+    private readonly ssTable: Repository<StockSymbol>,
+  ) {}
 
   async startSearch(query: string): Promise<YahooSearchResult[]> {
     const autocResults = await this.yahooSearch(query);
@@ -51,6 +58,10 @@ export class YahooApiService {
       { validateResult: false },
     ) as Promise<Quote>);
 
+    const stockSymbol = await this.ssTable.findOne({
+      where: { name: symbol.toLowerCase(), deleted: IsNull() },
+    });
+
     return {
       fullExchangeName: result.fullExchangeName,
       marketCap: result.marketCap ?? 0,
@@ -59,6 +70,7 @@ export class YahooApiService {
       regularMarketOpen: result.regularMarketOpen ?? 0,
       regularMarketPrice: result.regularMarketPrice ?? 0,
       regularMarketVolume: result.regularMarketVolume ?? 0,
+      symbolId: stockSymbol?.id ?? null,
     };
   }
 
