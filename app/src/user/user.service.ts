@@ -19,6 +19,7 @@ import { UserNotification } from 'src/db/client/tables/UserNotification';
 import { UserStocksStore } from 'src/db/client/tables/UserStocksStore';
 import { autoRetryTransaction } from 'src/db/utils/transactions';
 import { EventBus } from 'src/events/events.bus';
+import { convertNI } from 'src/utils/pg-interval';
 import { now } from 'src/utils/time';
 import { YahooApiService } from 'src/yahoo-api/yahoo-api.service';
 import { Connection, IsNull, Repository } from 'typeorm';
@@ -197,28 +198,6 @@ export class UserService {
     return notification.id;
   }
 
-  async getNotification(userId: number, notificationId: number): Promise<UserNotificationInfo> {
-    const notification = await this.un
-      .createQueryBuilder('un')
-      .innerJoin('un.user', 'ua', 'ua.id = :userId', { userId })
-      .where('un.id = :notificationId', {
-        notificationId,
-      })
-      .getOne();
-
-    if (!notification) {
-      throw new NotFoundException();
-    }
-
-    return {
-      deleted: notification.deleted,
-      id: notification.id,
-      notifyInterval: notification.notifyInterval,
-      triggerName: notification.triggerName,
-      triggerParam: notification.triggerParam,
-      triggerValue: notification.triggerValue,
-    };
-  }
   async getNotificationBySymbolId(userId: number, symbolId: string): Promise<UserNotificationInfo> {
     const notification = await this.un
       .createQueryBuilder('un')
@@ -233,7 +212,7 @@ export class UserService {
     return {
       deleted: notification.deleted,
       id: notification.id,
-      notifyInterval: notification.notifyInterval,
+      notifyInterval: convertNI(notification.notifyInterval),
       triggerName: notification.triggerName,
       triggerParam: notification.triggerParam,
       triggerValue: notification.triggerValue,
@@ -273,7 +252,7 @@ export class UserService {
     return {
       deleted: notification.deleted,
       id: notification.id,
-      notifyInterval: notification.notifyInterval,
+      notifyInterval: convertNI(notification.notifyInterval),
       triggerName: notification.triggerName,
       triggerParam: notification.triggerParam,
       triggerValue: notification.triggerValue,
