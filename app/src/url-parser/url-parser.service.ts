@@ -34,18 +34,24 @@ export class UrlParserService {
       }
     }
 
-    cachedLinks.forEach(data => {
+    const writeRes = (data: UrlParseResponse) => {
       res.write(`link=${data.link};imgUrl=${data.imgUrl};\n`);
       finishedLinks.push(data.link);
 
-      if (finishedLinks.length === links.length) res.end();
+      if (finishedLinks.length === links.length) finish();
+    };
+
+    const finish = () => {
+      EventBus.off(BusEvent.ArticleParseCompleted, writeRes);
+      res.end();
+    };
+
+    cachedLinks.forEach(data => {
+      writeRes(data);
     });
 
     EventBus.on(BusEvent.ArticleParseCompleted, data => {
-      res.write(`link=${data.link};imgUrl=${data.imgUrl};\n`);
-      finishedLinks.push(data.link);
-
-      if (finishedLinks.length === links.length) res.end();
+      writeRes(data);
     });
 
     for (const notCachedLink of notCachedLinks) {
