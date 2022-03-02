@@ -1,10 +1,8 @@
 import { UrlParserModel } from '@models';
-import { IsString, IsUrl } from 'class-validator';
-import { IsNotBlank } from 'src/interceptors/exts/isBlank';
+import { IsArray, IsString } from 'class-validator';
 
 export class UrlParserDto implements UrlParserModel {
-  @IsString()
-  @IsNotBlank()
-  @IsUrl()
-  link: string;
+  @IsArray()
+  @IsString({ each: true })
+  links: string[];
 }

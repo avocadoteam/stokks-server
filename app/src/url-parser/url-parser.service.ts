@@ -1,56 +1,56 @@
 import { UrlParseResponse } from '@models';
+import { InjectQueue } from '@nestjs/bull';
 import { Injectable } from '@nestjs/common';
-import * as puppeteer from 'puppeteer';
+import { Queue } from 'bull';
+import { Response } from 'express';
+import { BusEvent } from 'src/contracts/events/bus';
+import { JobData, JobName, JobNames, QueueName } from 'src/contracts/queue';
 import { HashUrlParser } from 'src/contracts/redis-cache';
+import { EventBus } from 'src/events/events.bus';
 import { RedisHashService } from 'src/redis-cache/redis-cache.module';
-import { dayInS } from 'src/utils/time';
 
 @Injectable()
 export class UrlParserService {
-  constructor(private readonly redis: RedisHashService) {}
+  constructor(
+    private readonly redis: RedisHashService,
+    @InjectQueue(QueueName.ArticleParse) private readonly queue: Queue,
+  ) {}
 
-  async getArticleImg(link: string): Promise<UrlParseResponse> {
+  async getArticleImgs(links: string[], res: Response) {
     console.debug('run url parser');
 
-    const cachedLink = await this.redis.hgetField(HashUrlParser.ParsedArticles, link);
+    const cachedLinks: UrlParseResponse[] = [];
+    const notCachedLinks: string[] = [];
+    const finishedLinks: string[] = [];
 
-    if (cachedLink) {
-      console.debug('return from cached');
+    for (const link of links) {
+      const cachedImgUrl = await this.redis.hgetField(HashUrlParser.ParsedArticles, link);
 
-      return {
-        imgUrl: cachedLink,
-      };
+      if (cachedImgUrl) {
+        console.debug('return from cached');
+        cachedLinks.push({ link, imgUrl: cachedImgUrl });
+      } else {
+        notCachedLinks.push(link);
+      }
     }
 
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--js-flags="--max-old-space-size=128"'],
-    });
-    const page = await browser.newPage();
+    cachedLinks.forEach(data => {
+      res.write(`link=${data.link};imgUrl=${data.imgUrl}\n`);
+      finishedLinks.push(data.link);
 
-    await page.goto(link);
-
-    await page.evaluate(async () => {
-      const btn = document.getElementsByClassName('btn primary')[0] as HTMLButtonElement;
-      btn?.click();
-    });
-    await page.waitForSelector('meta[property~="og:image"]');
-
-    const result = await page.evaluate(() => {
-      const element = document.querySelector('meta[property~="og:image"]');
-      const imgUrl = element && element.getAttribute('content');
-
-      return {
-        imgUrl,
-      };
+      if (finishedLinks.length === links.length) res.end();
     });
 
-    await browser.close();
+    EventBus.on(BusEvent.ArticleParseCompleted, data => {
+      res.write(`link=${data.link};imgUrl=${data.imgUrl}\n`);
+      finishedLinks.push(data.link);
 
-    if (result.imgUrl) {
-      await this.redis.hsetWithExpire(HashUrlParser.ParsedArticles, link, result.imgUrl, dayInS);
+      if (finishedLinks.length === links.length) res.end();
+    });
+
+    for (const notCachedLink of notCachedLinks) {
+      const jobData: JobData[JobName.GetImgFromArticle] = { url: notCachedLink };
+      await this.queue.add(JobNames[QueueName.ArticleParse][JobName.GetImgFromArticle], jobData);
     }
-
-    return result;
   }
 }

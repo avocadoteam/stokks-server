@@ -1,5 +1,6 @@
-import { Body, Controller, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Post, Res, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { Response } from 'express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { TransformInterceptor } from 'src/interceptors/transform.interceptor';
 import { UrlParserDto } from './dto/url-parser.model';
@@ -12,13 +13,14 @@ import { UrlParserService } from './url-parser.service';
 export class UrlParserController {
   constructor(private readonly up: UrlParserService) {}
 
-  @ApiOperation({ summary: 'Consumes article link and returns img from meta og:image' })
-  @ApiResponse({ schema: { example: { data: { imgUrl: 'string' } } }, status: 200 })
+  @ApiOperation({ summary: 'Consumes article links and returns imgs from meta og:image' })
   @ApiResponse({ description: 'if link is blank or not valid url', status: 400 })
-  @ApiBody({ schema: { example: { link: 'string' } } })
+  @ApiBody({ schema: { example: { links: ['string'] } } })
   @ApiBearerAuth()
   @Post()
-  getInfo(@Body() model: UrlParserDto) {
-    return this.up.getArticleImg(model.link);
+  async getInfo(@Body() model: UrlParserDto, @Res() res: Response) {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Transfer-Encoding', 'chunked');
+    await this.up.getArticleImgs(model.links, res);
   }
 }
