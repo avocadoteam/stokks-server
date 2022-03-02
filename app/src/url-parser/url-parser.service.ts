@@ -35,14 +35,14 @@ export class UrlParserService {
     }
 
     cachedLinks.forEach(data => {
-      res.write(`link=${data.link};imgUrl=${data.imgUrl}\n`);
+      res.write(`link=${data.link};imgUrl=${data.imgUrl};\n`);
       finishedLinks.push(data.link);
 
       if (finishedLinks.length === links.length) res.end();
     });
 
     EventBus.on(BusEvent.ArticleParseCompleted, data => {
-      res.write(`link=${data.link};imgUrl=${data.imgUrl}\n`);
+      res.write(`link=${data.link};imgUrl=${data.imgUrl};\n`);
       finishedLinks.push(data.link);
 
       if (finishedLinks.length === links.length) res.end();
