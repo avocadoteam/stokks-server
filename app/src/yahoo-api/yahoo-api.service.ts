@@ -1,9 +1,16 @@
-import { HistoricalData, HistoryPeriodTarget, NewsItem, SymbolGeneralInfo, YahooSearchResult } from '@models';
+import {
+  HistoricalData,
+  HistoryPeriodTarget,
+  HistoryResponseModel,
+  NewsItem,
+  SymbolGeneralInfo,
+  YahooSearchResult,
+} from '@models';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { firstValueFrom } from 'rxjs';
-import { HistoryResponseModel, SearchResponseModel } from 'src/contracts/yahoo';
+import { SearchResponseModel } from 'src/contracts/yahoo';
 import { StockSymbol } from 'src/db/client/tables/StockSymbol';
 import { IsNull, Repository } from 'typeorm';
 import yahooFinance from 'yahoo-finance2';
@@ -158,6 +165,18 @@ export class YahooApiService {
         open: [],
         volume: [],
       };
+    }
+  }
+  async getCompleteHistory(symbol: string, target: HistoryPeriodTarget): Promise<HistoryResponseModel | null> {
+    const { interval, range } = this.getPeriodFromTarget2(target);
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURI(symbol)}?interval=${interval}&range=${range}`;
+    try {
+      const { data } = await firstValueFrom(this.httpService.get<HistoryResponseModel>(url));
+
+      return data;
+    } catch (error) {
+      console.error(error);
+      return null;
     }
   }
 

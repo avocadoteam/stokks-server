@@ -45,6 +45,21 @@ export class StocksController {
     return this.ya.getHistory(model.symbol, model.target);
   }
 
+  @ApiResponse({ schema: { example: { data: 'HistoryResponseModel' } }, status: 200 })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        symbol: { type: 'string' },
+        target: { type: 'enum', enum: [HistoryPeriodTarget] },
+      },
+    },
+  })
+  @Post('symbol/history/full')
+  getCompleteSymbolHistory(@Body() model: SymbolHystoryDto) {
+    return this.ya.getCompleteHistory(model.symbol, model.target);
+  }
+
   @ApiResponse({ schema: { example: { data: 'NewsItem[]' } }, status: 200, description: 'returns only 5 latest news' })
   @ApiQuery({ name: 'query', required: true })
   @Get('symbol/news')
