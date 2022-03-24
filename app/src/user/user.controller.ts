@@ -20,6 +20,7 @@ import { TransformInterceptor } from 'src/interceptors/transform.interceptor';
 import {
   UserCreateDto,
   UserDeleteStoreDto,
+  UserGooleCreateDto,
   UserNotificationDto,
   UserNotificationUpdateDto,
   UserStoreDto,
@@ -46,6 +47,21 @@ export class UserController {
   @Post()
   createUser(@Body() model: UserCreateDto) {
     return this.us.createUser(model.password);
+  }
+
+  @ApiResponse({ schema: { example: { data: 'number' } }, status: 200 })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', minLength: 8 },
+        email: { type: 'string', maxLength: 1024, minLength: 8 },
+      },
+    },
+  })
+  @Post('google')
+  createGoogleUser(@Body() model: UserGooleCreateDto) {
+    return this.us.createGoogleUser(model.email, model.id);
   }
 
   @ApiResponse({ status: 201 })

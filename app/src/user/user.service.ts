@@ -66,6 +66,28 @@ export class UserService {
 
     return userId;
   }
+  async createGoogleUser(email: string, id: string) {
+    const userId = await autoRetryTransaction(this.connection, async qr => {
+      const exists = await qr.manager.findOne(UserAccount, { where: { email } });
+      if (exists) return exists.id;
+
+      const newUser = new UserAccount();
+
+      const passSalt = await genSalt();
+      const passHash = await hash(id, passSalt);
+
+      newUser.passHash = passHash as any;
+      newUser.passSalt = passSalt as any;
+      newUser.email = email;
+
+      await qr.manager.save(newUser);
+
+      await qr.commitTransaction();
+      return newUser.id;
+    });
+
+    return userId;
+  }
 
   async hasUser(userId: number) {
     return (await this.ua.count({ where: { id: userId } })) > 0;

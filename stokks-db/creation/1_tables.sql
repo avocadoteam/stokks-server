@@ -8,6 +8,7 @@ create table stock_symbol (
 create table user_account (
   user_account_id serial,
   name varchar(256),
+  email varchar(1024),
   pass_hash bytea not null,
   pass_salt bytea not null,
   primary key (user_account_id)

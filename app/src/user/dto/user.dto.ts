@@ -3,11 +3,12 @@ import {
   TriggerParam,
   UserCreateModel,
   UserDeleteStoreModel,
+  UserGoogleCreateModel,
   UserNotificationModel,
   UserNotificationUpdateModel,
   UserStoreModel,
 } from '@models';
-import { IsBoolean, IsEnum, IsNumber, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsBoolean, IsEmail, IsEnum, IsNumber, IsString, MaxLength, MinLength } from 'class-validator';
 import { IsNotBlank } from 'src/interceptors/exts/isBlank';
 
 export class UserStoreDto implements UserStoreModel {
@@ -25,6 +26,19 @@ export class UserCreateDto implements UserCreateModel {
   @MaxLength(100)
   password: string;
 }
+export class UserGooleCreateDto implements UserGoogleCreateModel {
+  @IsString()
+  @IsNotBlank()
+  @MinLength(8)
+  id: string;
+
+  @IsString()
+  @IsNotBlank()
+  @MaxLength(1024)
+  @IsEmail()
+  email: string;
+}
+
 export class UserDeleteStoreDto implements UserDeleteStoreModel {
   @IsNumber()
   userId: number;
