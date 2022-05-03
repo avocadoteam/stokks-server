@@ -16,11 +16,11 @@ export class AuthService {
 
   async validateUser(userId: number, pass: string) {
     this.logger.debug(`Looking for user ${userId}`);
-    let user: UserAccount | undefined;
+    let user: UserAccount | null;
     if (typeof userId === 'string') {
-      user = await this.ua.findOne({ name: String(userId) });
+      user = await this.ua.findOneBy({ name: String(userId) });
     } else {
-      user = await this.ua.findOne(userId);
+      user = await this.ua.findOneBy({ id: userId });
     }
 
     if (user) {

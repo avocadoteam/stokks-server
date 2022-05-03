@@ -243,7 +243,7 @@ export class UserService {
 
   async updateNotification(notificationId: number, data: UserNotificationUpdateModel): Promise<UserNotificationInfo> {
     const notification = await autoRetryTransaction(this.connection, async qr => {
-      const notif = await qr.manager.findOne(UserNotification, notificationId);
+      const notif = await qr.manager.findOneBy(UserNotification, { id: notificationId });
 
       if (!notif) {
         return null;

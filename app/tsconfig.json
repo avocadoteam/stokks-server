@@ -19,6 +19,7 @@
     "importHelpers": true,
     "forceConsistentCasingInFileNames": true,
     "strictPropertyInitialization": false,
+    "useUnknownInCatchVariables": false,
     "paths": {
       "@models": [
         "../stokks-models/index"
