@@ -284,12 +284,18 @@ export class UserService {
 
   async installNotification(userId: number, token: string) {
     await autoRetryTransaction(this.connection, async qr => {
-      const newExpo = new ExpoSettings();
+      const expoSetting = await qr.manager.findOneBy(ExpoSettings, { user: { id: userId } });
+      if (expoSetting) {
+        expoSetting.token = token as any;
+        await qr.manager.save(expoSetting);
+      } else {
+        const newExpo = new ExpoSettings();
 
-      newExpo.token = token as any;
-      newExpo.user = userId as unknown as UserAccount;
+        newExpo.token = token as any;
+        newExpo.user = userId as unknown as UserAccount;
 
-      await qr.manager.save(newExpo);
+        await qr.manager.save(newExpo);
+      }
 
       await qr.commitTransaction();
     });
