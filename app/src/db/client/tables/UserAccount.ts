@@ -1,4 +1,5 @@
 import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { ExpoSettings } from './ExpoSettings';
 import { UserNotification } from './UserNotification';
 import { UserStocksStore } from './UserStocksStore';
 
@@ -38,4 +39,7 @@ export class UserAccount {
 
   @OneToMany(() => UserNotification, un => un.user)
   notifications: UserNotification[];
+
+  @OneToOne(() => ExpoSettings, es => es.user)
+  userExpoSettings: ExpoSettings;
 }

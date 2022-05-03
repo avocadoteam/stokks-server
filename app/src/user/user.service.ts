@@ -13,6 +13,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { genSalt, hash } from 'bcrypt';
 import { userConfig } from 'src/config/user.config';
 import { BusEvent } from 'src/contracts/events/bus';
+import { ExpoSettings } from 'src/db/client/tables/ExpoSettings';
 import { StockSymbol } from 'src/db/client/tables/StockSymbol';
 import { UserAccount } from 'src/db/client/tables/UserAccount';
 import { UserNotification } from 'src/db/client/tables/UserNotification';
@@ -279,5 +280,18 @@ export class UserService {
       triggerParam: notification.triggerParam,
       triggerValue: notification.triggerValue,
     };
+  }
+
+  async installNotification(userId: number, token: string) {
+    await autoRetryTransaction(this.connection, async qr => {
+      const newExpo = new ExpoSettings();
+
+      newExpo.token = token as any;
+      newExpo.user = userId as unknown as UserAccount;
+
+      await qr.manager.save(newExpo);
+
+      await qr.commitTransaction();
+    });
   }
 }

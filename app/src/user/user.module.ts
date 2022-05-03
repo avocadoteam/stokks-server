@@ -2,6 +2,7 @@ import { BullModule } from '@nestjs/bull';
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { QueueName } from 'src/contracts/queue';
+import { ExpoSettings } from 'src/db/client/tables/ExpoSettings';
 import { StockSymbol } from 'src/db/client/tables/StockSymbol';
 import { UserAccount } from 'src/db/client/tables/UserAccount';
 import { UserNotification } from 'src/db/client/tables/UserNotification';
@@ -15,7 +16,7 @@ import { UserService } from './user.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([StockSymbol, UserAccount, UserNotification, UserStocksStore]),
+    TypeOrmModule.forFeature([StockSymbol, UserAccount, UserNotification, UserStocksStore, ExpoSettings]),
     YahooApiModule,
     BullModule.registerQueue({
       name: QueueName.UserPriceNotification,

@@ -4,6 +4,7 @@ import {
   UserCreateModel,
   UserDeleteStoreModel,
   UserGoogleCreateModel,
+  UserNotificationInstallModel,
   UserNotificationModel,
   UserNotificationUpdateModel,
   UserStoreModel,
@@ -80,4 +81,10 @@ export class UserNotificationUpdateDto implements UserNotificationUpdateModel {
   @IsString()
   @IsNotBlank()
   triggerValue: string;
+}
+
+export class UserNotificationInstallDto implements UserNotificationInstallModel {
+  @IsString()
+  @IsNotBlank()
+  token: string;
 }

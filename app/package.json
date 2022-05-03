@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "create:migration": "typeorm migration:create -d src/db/client/migrations",
+    "create:migration": "typeorm migration:create src/db/client/migrations",
     "create:db": "node ./src/db/utils/create-db",
     "prebuild": "rimraf dist",
     "build": "nest build",

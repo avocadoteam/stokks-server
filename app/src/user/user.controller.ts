@@ -22,6 +22,7 @@ import {
   UserDeleteStoreDto,
   UserGooleCreateDto,
   UserNotificationDto,
+  UserNotificationInstallDto,
   UserNotificationUpdateDto,
   UserStoreDto,
 } from './dto/user.dto';
@@ -177,6 +178,27 @@ export class UserController {
     await this.checkUser(userId);
 
     return this.us.updateNotification(notificationId, model);
+  }
+
+  @ApiResponse({ status: 200 })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        token: { type: 'string' },
+      },
+    },
+  })
+  @UseGuards(JwtAuthGuard)
+  @Post(':userId/notification/install')
+  async Notification(
+    @Param('userId', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.BAD_REQUEST })) userId: number,
+    @Body() model: UserNotificationInstallDto,
+  ) {
+    await this.checkUser(userId);
+
+    this.us.installNotification(userId, model.token);
   }
 
   private async checkUser(userId: number) {

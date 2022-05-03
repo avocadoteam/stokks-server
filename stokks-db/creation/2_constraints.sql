@@ -10,3 +10,5 @@ select schema_create_fk_constraint('user_stocks_store', 'stock_symbol_id', 'stoc
 
 select schema_create_fk_constraint('user_notification', 'user_account_id', 'user_account', 'user_account_id');
 select schema_create_fk_constraint('user_notification', 'stock_symbol_id', 'stock_symbol', 'stock_symbol_id');
+
+select schema_create_fk_constraint('expo_settings', 'user_account_id', 'user_account', 'user_account_id');
