@@ -1,4 +1,4 @@
-import { TriggerName } from '@models';
+import { SymbolGeneralInfo, TriggerName } from '@models';
 import { Process, Processor } from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -48,7 +48,7 @@ export class NotificationProcessor {
 
     if (resolveCondition(data.regularMarketPrice, Number(notification.triggerValue), notification.triggerParam)) {
       this.logger.log('send notification to client');
-      this.expoNotify(notification);
+      this.expoNotify(notification, data);
     }
 
     EventBus.emit(BusEvent.UserChangedNotification, {
@@ -58,7 +58,7 @@ export class NotificationProcessor {
     });
   }
 
-  private async expoNotify(notification: UserNotification) {
+  private async expoNotify(notification: UserNotification, data: SymbolGeneralInfo) {
     let expo = new Expo();
     let messages: ExpoPushMessage[] = [];
 
@@ -77,7 +77,7 @@ export class NotificationProcessor {
     messages.push({
       to: token,
       sound: 'default',
-      body: `Price has been change for ${notification.stockSymbol.name}.`,
+      body: `Price has been change for ${data.fullExchangeName}. It is now $${data.regularMarketPrice.toFixed(2)}`,
       data: { symbolName: notification.stockSymbol.name, symbolId: notification.stockSymbol.id },
     });
 
