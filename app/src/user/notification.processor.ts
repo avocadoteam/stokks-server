@@ -77,7 +77,7 @@ export class NotificationProcessor {
     messages.push({
       to: token,
       sound: 'default',
-      body: `Price has been change for ${data.fullExchangeName}. It is now $${data.regularMarketPrice.toFixed(2)}`,
+      body: `Price has been change for ${data.label}. It is now $${data.regularMarketPrice.toFixed(2)}`,
       data: { symbolName: notification.stockSymbol.name, symbolId: notification.stockSymbol.id },
     });
 

@@ -78,6 +78,7 @@ export class YahooApiService {
       regularMarketPrice: result.regularMarketPrice ?? 0,
       regularMarketVolume: result.regularMarketVolume ?? 0,
       symbolId: stockSymbol?.id ?? null,
+      label: result.shortName ?? result.symbol,
     };
   }
 
