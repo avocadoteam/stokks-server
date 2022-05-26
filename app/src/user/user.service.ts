@@ -3,6 +3,7 @@ import {
   HistoryPeriodTarget,
   TriggerName,
   UserNotificationInfo,
+  UserNotificationInstallModel,
   UserNotificationModel,
   UserNotificationUpdateModel,
   UserStoreItem,
@@ -286,7 +287,7 @@ export class UserService {
     };
   }
 
-  async installNotification(userId: number, token: string) {
+  async installNotification(userId: number, { token, device }: UserNotificationInstallModel) {
     await autoRetryTransaction(this.connection, async qr => {
       const expoSetting = await qr.manager.findOneBy(ExpoSettings, { user: { id: userId } });
       if (expoSetting) {
@@ -297,6 +298,7 @@ export class UserService {
 
         newExpo.token = token as any;
         newExpo.user = userId as unknown as UserAccount;
+        newExpo.device = device;
 
         await qr.manager.save(newExpo);
       }

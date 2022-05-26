@@ -193,7 +193,7 @@ export class UserController {
   async Notification(@Body() model: UserNotificationInstallDto, @UserId() userId: number) {
     await this.checkUser(userId);
 
-    this.us.installNotification(userId, model.token);
+    this.us.installNotification(userId, model);
   }
 
   private async checkUser(userId?: number) {
