@@ -15,6 +15,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UserId } from 'src/auth/decorators/userid.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { TransformInterceptor } from 'src/interceptors/transform.interceptor';
 import {
@@ -87,8 +88,8 @@ export class UserController {
   @ApiResponse({ schema: { example: { data: 'UserStoreItem[]' } }, status: 200 })
   @ApiResponse({ status: 404, description: 'User or store not found' })
   @UseGuards(JwtAuthGuard)
-  @Get(':userId/store')
-  async getUserStore(@Param('userId', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.BAD_REQUEST })) userId: number) {
+  @Get('store')
+  async getUserStore(@UserId() userId: number) {
     await this.checkUser(userId);
 
     return this.us.getUserStore(userId);
@@ -145,11 +146,8 @@ export class UserController {
   @ApiResponse({ schema: { example: { data: 'UserNotificationInfo' } }, status: 200 })
   @ApiResponse({ status: 404, description: 'User or notification not found' })
   @UseGuards(JwtAuthGuard)
-  @Get(':userId/notifications/:symbolId')
-  async getNotifications(
-    @Param('userId', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.BAD_REQUEST })) userId: number,
-    @Param('symbolId') symbolId: string,
-  ) {
+  @Get('notifications/:symbolId')
+  async getNotifications(@UserId() userId: number, @Param('symbolId') symbolId: string) {
     await this.checkUser(userId);
 
     return this.us.getNotificationBySymbolId(userId, symbolId);
@@ -169,15 +167,15 @@ export class UserController {
     },
   })
   @UseGuards(JwtAuthGuard)
-  @Put(':userId/notification/:id')
+  @Put('notification/:id')
   async updateNotification(
-    @Param('userId', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.BAD_REQUEST })) userId: number,
+    @UserId() userId: number,
     @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.BAD_REQUEST })) notificationId: number,
     @Body() model: UserNotificationUpdateDto,
   ) {
     await this.checkUser(userId);
 
-    return this.us.updateNotification(notificationId, model);
+    return this.us.updateNotification(userId, notificationId, model);
   }
 
   @ApiResponse({ status: 200 })
@@ -191,17 +189,14 @@ export class UserController {
     },
   })
   @UseGuards(JwtAuthGuard)
-  @Post(':userId/notification/install')
-  async Notification(
-    @Param('userId', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.BAD_REQUEST })) userId: number,
-    @Body() model: UserNotificationInstallDto,
-  ) {
+  @Post('notification/install')
+  async Notification(@Body() model: UserNotificationInstallDto, @UserId() userId: number) {
     await this.checkUser(userId);
 
     this.us.installNotification(userId, model.token);
   }
 
-  private async checkUser(userId: number) {
+  private async checkUser(userId?: number) {
     if (!(await this.us.hasUser(userId))) {
       throw new NotFoundException();
     }

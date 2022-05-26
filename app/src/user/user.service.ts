@@ -90,7 +90,7 @@ export class UserService {
     return userId;
   }
 
-  async hasUser(userId: number) {
+  async hasUser(userId?: number) {
     return (await this.ua.count({ where: { id: userId } })) > 0;
   }
 
@@ -242,9 +242,13 @@ export class UserService {
     };
   }
 
-  async updateNotification(notificationId: number, data: UserNotificationUpdateModel): Promise<UserNotificationInfo> {
+  async updateNotification(
+    userId: number,
+    notificationId: number,
+    data: UserNotificationUpdateModel,
+  ): Promise<UserNotificationInfo> {
     const notification = await autoRetryTransaction(this.connection, async qr => {
-      const notif = await qr.manager.findOneBy(UserNotification, { id: notificationId });
+      const notif = await qr.manager.findOneBy(UserNotification, { id: notificationId, user: { id: userId } });
 
       if (!notif) {
         return null;

@@ -1,3 +1,4 @@
+import { IsBoolean, IsEmail, IsEnum, IsNumber, IsString, MaxLength, MinLength } from 'class-validator';
 import {
   NotificationIntervalTarget,
   TriggerParam,
@@ -9,7 +10,7 @@ import {
   UserNotificationUpdateModel,
   UserStoreModel,
 } from '@models';
-import { IsBoolean, IsEmail, IsEnum, IsNumber, IsString, MaxLength, MinLength } from 'class-validator';
+
 import { IsNotBlank } from 'src/interceptors/exts/isBlank';
 
 export class UserStoreDto implements UserStoreModel {
@@ -87,4 +88,8 @@ export class UserNotificationInstallDto implements UserNotificationInstallModel 
   @IsString()
   @IsNotBlank()
   token: string;
+
+  @IsString()
+  @IsNotBlank()
+  device: string;
 }
