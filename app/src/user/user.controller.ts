@@ -73,16 +73,15 @@ export class UserController {
       type: 'object',
       properties: {
         symbol: { type: 'string' },
-        userId: { type: 'number' },
       },
     },
   })
   @UseGuards(JwtAuthGuard)
   @Put('store')
-  async addToUserStore(@Body() model: UserStoreDto) {
-    await this.checkUser(model.userId);
+  async addToUserStore(@Body() model: UserStoreDto, @UserId() userId: number) {
+    await this.checkUser(userId);
 
-    await this.us.fillTheStore(model.userId, model.symbol);
+    await this.us.fillTheStore(userId, model.symbol);
   }
 
   @ApiResponse({ schema: { example: { data: 'UserStoreItem[]' } }, status: 200 })
@@ -102,16 +101,15 @@ export class UserController {
       type: 'object',
       properties: {
         symbolId: { type: 'string' },
-        userId: { type: 'number' },
       },
     },
   })
   @UseGuards(JwtAuthGuard)
   @Delete('store')
-  async deleteFromUserStore(@Body() model: UserDeleteStoreDto) {
-    await this.checkUser(model.userId);
+  async deleteFromUserStore(@Body() model: UserDeleteStoreDto, @UserId() userId: number) {
+    await this.checkUser(userId);
 
-    await this.us.deleteFromTheStore(model.userId, model.symbolId);
+    await this.us.deleteFromTheStore(userId, model.symbolId);
   }
 
   @ApiResponse({ schema: { example: { data: 'number' } }, status: 200 })
@@ -121,7 +119,6 @@ export class UserController {
       type: 'object',
       properties: {
         symbol: { type: 'string' },
-        userId: { type: 'number' },
         triggerParam: { type: 'enum', enum: [TriggerParam] },
         triggerValue: { type: 'string' },
         notifyInterval: { type: 'enum', enum: [NotificationIntervalTarget] },
@@ -133,14 +130,14 @@ export class UserController {
   @ApiResponse({ status: 409, description: 'Notification has already been created' })
   @UseGuards(JwtAuthGuard)
   @Post('notification')
-  async createNotification(@Body() model: UserNotificationDto) {
-    await this.checkUser(model.userId);
+  async createNotification(@Body() model: UserNotificationDto, @UserId() userId: number) {
+    await this.checkUser(userId);
 
-    if (await this.us.hasUserNotification(model.userId, model.symbol)) {
+    if (await this.us.hasUserNotification(userId, model.symbol)) {
       throw new ConflictException();
     }
 
-    return this.us.createNotification(model);
+    return this.us.createNotification(userId, model);
   }
 
   @ApiResponse({ schema: { example: { data: 'UserNotificationInfo' } }, status: 200 })

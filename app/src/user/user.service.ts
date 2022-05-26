@@ -179,7 +179,7 @@ export class UserService {
     );
   }
 
-  async createNotification({ symbol, notifyInterval, triggerParam, triggerValue, userId }: UserNotificationModel) {
+  async createNotification(userId: number, { symbol, notifyInterval, triggerParam, triggerValue }: UserNotificationModel) {
     const notification = await autoRetryTransaction(this.connection, async qr => {
       let stockSymbolId: string | null = null;
       const stockSymbol = await qr.manager.findOne(StockSymbol, {

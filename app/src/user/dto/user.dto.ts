@@ -1,4 +1,4 @@
-import { IsBoolean, IsEmail, IsEnum, IsNumber, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsBoolean, IsEmail, IsEnum, IsString, MaxLength, MinLength } from 'class-validator';
 import {
   NotificationIntervalTarget,
   TriggerParam,
@@ -14,9 +14,6 @@ import {
 import { IsNotBlank } from 'src/interceptors/exts/isBlank';
 
 export class UserStoreDto implements UserStoreModel {
-  @IsNumber()
-  userId: number;
-
   @IsString()
   @IsNotBlank()
   symbol: string;
@@ -42,18 +39,12 @@ export class UserGooleCreateDto implements UserGoogleCreateModel {
 }
 
 export class UserDeleteStoreDto implements UserDeleteStoreModel {
-  @IsNumber()
-  userId: number;
-
   @IsString()
   @IsNotBlank()
   symbolId: string;
 }
 
 export class UserNotificationDto implements UserNotificationModel {
-  @IsNumber()
-  userId: number;
-
   @IsString()
   @IsNotBlank()
   symbol: string;
