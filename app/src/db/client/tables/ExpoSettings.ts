@@ -1,4 +1,5 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+
 import { UserAccount } from './UserAccount';
 
 @Entity({
@@ -14,7 +15,12 @@ export class ExpoSettings {
   })
   token: Buffer;
 
-  @OneToOne(() => UserAccount, ua => ua.userStocksStore)
+  @Column({
+    type: 'text',
+  })
+  device: string;
+
+  @ManyToOne(() => UserAccount, ua => ua.userStocksStore)
   @JoinColumn({
     name: 'user_account_id',
   })

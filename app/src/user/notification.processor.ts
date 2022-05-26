@@ -62,24 +62,26 @@ export class NotificationProcessor {
     let expo = new Expo();
     let messages: ExpoPushMessage[] = [];
 
-    const expoSetting = await this.es.findOneBy({ user: { id: notification.user.id } });
-    if (!expoSetting?.token) {
+    const expoSetting = await this.es.findBy({ user: { id: notification.user.id } });
+    if (!expoSetting.length) {
       this.logger.error(`Push token not found`);
       return;
     }
-    const token = expoSetting.token.toString('utf8');
+    const tokens = expoSetting.map(v => v.token.toString('utf8'));
 
-    if (!Expo.isExpoPushToken(token)) {
-      this.logger.error(`Push token ${token} is not a valid Expo push token`);
-      return;
+    for (const token of tokens) {
+      if (!Expo.isExpoPushToken(token)) {
+        this.logger.error(`Push token ${token} is not a valid Expo push token`);
+        return;
+      }
+
+      messages.push({
+        to: token,
+        sound: 'default',
+        body: `Price has been change for ${data.label}. It is now $${data.regularMarketPrice.toFixed(2)}`,
+        data: { symbolName: notification.stockSymbol.name, symbolId: notification.stockSymbol.id },
+      });
     }
-
-    messages.push({
-      to: token,
-      sound: 'default',
-      body: `Price has been change for ${data.label}. It is now $${data.regularMarketPrice.toFixed(2)}`,
-      data: { symbolName: notification.stockSymbol.name, symbolId: notification.stockSymbol.id },
-    });
 
     let chunks = expo.chunkPushNotifications(messages);
     let tickets: ExpoPushTicket[] = [];
