@@ -1,18 +1,20 @@
-import { BullModule } from '@nestjs/bull';
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { QueueName } from 'src/contracts/queue';
+
+import { BullModule } from '@nestjs/bull';
 import { ExpoSettings } from 'src/db/client/tables/ExpoSettings';
-import { StockSymbol } from 'src/db/client/tables/StockSymbol';
-import { UserAccount } from 'src/db/client/tables/UserAccount';
-import { UserNotification } from 'src/db/client/tables/UserNotification';
-import { UserStocksStore } from 'src/db/client/tables/UserStocksStore';
 import { FetchLimiter } from 'src/interceptors/rate-limiter';
-import { YahooApiModule } from 'src/yahoo-api/yahoo-api.module';
 import { NotificationProcessor } from './notification.processor';
 import { NotificationService } from './notification.service';
+import { QueueName } from 'src/contracts/queue';
+import { StockSymbol } from 'src/db/client/tables/StockSymbol';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserAccount } from 'src/db/client/tables/UserAccount';
 import { UserController } from './user.controller';
+import { UserExpoService } from './user-expo.service';
+import { UserNotification } from 'src/db/client/tables/UserNotification';
 import { UserService } from './user.service';
+import { UserStocksStore } from 'src/db/client/tables/UserStocksStore';
+import { YahooApiModule } from 'src/yahoo-api/yahoo-api.module';
 
 @Module({
   imports: [
@@ -23,7 +25,7 @@ import { UserService } from './user.service';
     }),
   ],
   controllers: [UserController],
-  providers: [UserService, NotificationProcessor, NotificationService],
+  providers: [UserService, UserExpoService, NotificationProcessor, NotificationService],
 })
 export class UserModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

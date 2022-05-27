@@ -62,9 +62,9 @@ export class NotificationProcessor {
     let expo = new Expo();
     let messages: ExpoPushMessage[] = [];
 
-    const expoSetting = await this.es.findBy({ user: { id: notification.user.id } });
+    const expoSetting = await this.es.findBy({ user: { id: notification.user.id }, enableNotification: true });
     if (!expoSetting.length) {
-      this.logger.error(`Push token not found`);
+      this.logger.error(`Push tokens not found`);
       return;
     }
     const tokens = expoSetting.map(v => v.token.toString('utf8'));

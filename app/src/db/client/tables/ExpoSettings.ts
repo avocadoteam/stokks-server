@@ -20,6 +20,12 @@ export class ExpoSettings {
   })
   device: string;
 
+  @Column({
+    type: 'boolean',
+    name: 'enabled_notification',
+  })
+  enableNotification: boolean;
+
   @ManyToOne(() => UserAccount, ua => ua.userStocksStore)
   @JoinColumn({
     name: 'user_account_id',

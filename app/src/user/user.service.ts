@@ -3,7 +3,6 @@ import {
   HistoryPeriodTarget,
   TriggerName,
   UserNotificationInfo,
-  UserNotificationInstallModel,
   UserNotificationModel,
   UserNotificationUpdateModel,
   UserStoreItem,
@@ -14,7 +13,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { genSalt, hash } from 'bcrypt';
 import { userConfig } from 'src/config/user.config';
 import { BusEvent } from 'src/contracts/events/bus';
-import { ExpoSettings } from 'src/db/client/tables/ExpoSettings';
 import { StockSymbol } from 'src/db/client/tables/StockSymbol';
 import { UserAccount } from 'src/db/client/tables/UserAccount';
 import { UserNotification } from 'src/db/client/tables/UserNotification';
@@ -285,25 +283,5 @@ export class UserService {
       triggerParam: notification.triggerParam,
       triggerValue: notification.triggerValue,
     };
-  }
-
-  async installNotification(userId: number, { token, device }: UserNotificationInstallModel) {
-    await autoRetryTransaction(this.connection, async qr => {
-      const expoSetting = await qr.manager.findOneBy(ExpoSettings, { user: { id: userId } });
-      if (expoSetting) {
-        expoSetting.token = token as any;
-        await qr.manager.save(expoSetting);
-      } else {
-        const newExpo = new ExpoSettings();
-
-        newExpo.token = token as any;
-        newExpo.user = userId as unknown as UserAccount;
-        newExpo.device = device;
-
-        await qr.manager.save(newExpo);
-      }
-
-      await qr.commitTransaction();
-    });
   }
 }

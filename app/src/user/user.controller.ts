@@ -9,6 +9,7 @@ import {
   NotFoundException,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Put,
   UseGuards,
@@ -23,10 +24,12 @@ import {
   UserDeleteStoreDto,
   UserGooleCreateDto,
   UserNotificationDto,
-  UserNotificationInstallDto,
+  UserExpoSettingsInstallDto,
+  UserExpoSettingsPatchDto,
   UserNotificationUpdateDto,
   UserStoreDto,
 } from './dto/user.dto';
+import { UserExpoService } from './user-expo.service';
 import { UserService } from './user.service';
 
 @ApiTags('User operations')
@@ -35,7 +38,7 @@ import { UserService } from './user.service';
 @ApiBearerAuth()
 @UseInterceptors(TransformInterceptor)
 export class UserController {
-  constructor(private readonly us: UserService) {}
+  constructor(private readonly us: UserService, private readonly ues: UserExpoService) {}
 
   @ApiResponse({ schema: { example: { data: 'number' } }, status: 200 })
   @ApiBody({
@@ -186,11 +189,29 @@ export class UserController {
     },
   })
   @UseGuards(JwtAuthGuard)
-  @Post('notification/install')
-  async Notification(@Body() model: UserNotificationInstallDto, @UserId() userId: number) {
+  @Post('notification/expo-settings')
+  async Notification(@Body() model: UserExpoSettingsInstallDto, @UserId() userId: number) {
     await this.checkUser(userId);
 
-    this.us.installNotification(userId, model);
+    this.ues.installNotification(userId, model);
+  }
+
+  @ApiResponse({ status: 200 })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        enable: { type: 'boolean' },
+      },
+    },
+  })
+  @UseGuards(JwtAuthGuard)
+  @Patch('notification/expo-settings')
+  async changeExpoSettings(@Body() model: UserExpoSettingsPatchDto, @UserId() userId: number) {
+    await this.checkUser(userId);
+
+    this.ues.patchExpoNotification(userId, model);
   }
 
   private async checkUser(userId?: number) {

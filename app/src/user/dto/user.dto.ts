@@ -4,8 +4,9 @@ import {
   TriggerParam,
   UserCreateModel,
   UserDeleteStoreModel,
+  UserExpoSettingsInstallModel,
+  UserExpoSettingsPatchModel,
   UserGoogleCreateModel,
-  UserNotificationInstallModel,
   UserNotificationModel,
   UserNotificationUpdateModel,
   UserStoreModel,
@@ -75,10 +76,18 @@ export class UserNotificationUpdateDto implements UserNotificationUpdateModel {
   triggerValue: string;
 }
 
-export class UserNotificationInstallDto implements UserNotificationInstallModel {
+export class UserExpoSettingsInstallDto implements UserExpoSettingsInstallModel {
   @IsString()
   @IsNotBlank()
   token: string;
+
+  @IsString()
+  @IsNotBlank()
+  device: string;
+}
+export class UserExpoSettingsPatchDto implements UserExpoSettingsPatchModel {
+  @IsBoolean()
+  enable: boolean;
 
   @IsString()
   @IsNotBlank()
