@@ -82,15 +82,17 @@ export class YahooApiService {
     };
   }
 
-  async getLatestNews(query: string): Promise<NewsItem[]> {
-    const { news } = await yahooFinance.search(query, { newsCount: 5, quotesCount: 0 });
-    return news.map(r => ({
-      link: r.link,
-      providerPublishTime: r.providerPublishTime,
-      publisher: r.publisher,
-      title: r.title,
-      uuid: r.uuid,
-    }));
+  async getLatestNews(q: string): Promise<NewsItem[]> {
+    const url = `https://query2.finance.yahoo.com/v1/finance/search?lang=en-US&region=US&quotesCount=0&newsCount=5&enableFuzzyQuery=false&quotesQueryId=tss_match_phrase_query&multiQuoteQueryId=multi_quote_single_token_query&newsQueryId=news_cie_vespa&enableCb=true&enableNavLinks=true&enableEnhancedTrivialQuery=true&q=${encodeURI(
+      q,
+    )}`;
+    try {
+      const { data } = await firstValueFrom(this.httpService.get<SearchResponseModel>(url));
+      return data.news;
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
   }
   async getTrendingSymbols(count: number): Promise<YahooSearchResult[]> {
     const { quotes } = await yahooFinance.trendingSymbols('US', { count });

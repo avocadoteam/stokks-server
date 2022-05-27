@@ -1,3 +1,5 @@
+import { NewsItem } from '@models';
+
 export type SearchResponseModel = {
   count: number;
   quotes: {
@@ -11,12 +13,5 @@ export type SearchResponseModel = {
     longname: string;
     isYahooFinance: boolean;
   }[];
-  news: {
-    uuid: string;
-    title: string;
-    publisher: string;
-    link: string;
-    providerPublishTime: number;
-    type: 'STORY';
-  }[];
+  news: NewsItem[];
 };
