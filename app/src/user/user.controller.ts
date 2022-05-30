@@ -20,12 +20,11 @@ import { UserId } from 'src/auth/decorators/userid.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { TransformInterceptor } from 'src/interceptors/transform.interceptor';
 import {
-  UserCreateDto,
   UserDeleteStoreDto,
-  UserGooleCreateDto,
-  UserNotificationDto,
   UserExpoSettingsInstallDto,
   UserExpoSettingsPatchDto,
+  UserGooleCreateDto,
+  UserNotificationDto,
   UserNotificationUpdateDto,
   UserStoreDto,
 } from './dto/user.dto';
@@ -39,20 +38,6 @@ import { UserService } from './user.service';
 @UseInterceptors(TransformInterceptor)
 export class UserController {
   constructor(private readonly us: UserService, private readonly ues: UserExpoService) {}
-
-  @ApiResponse({ schema: { example: { data: 'number' } }, status: 200 })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        password: { type: 'string', maxLength: 100, minLength: 8 },
-      },
-    },
-  })
-  @Post()
-  createUser(@Body() model: UserCreateDto) {
-    return this.us.createUser(model.password);
-  }
 
   @ApiResponse({ schema: { example: { data: 'number' } }, status: 200 })
   @ApiBody({
