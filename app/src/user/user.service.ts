@@ -68,7 +68,7 @@ export class UserService {
   }
   async createGoogleUser(email: string, id: string) {
     const userId = await autoRetryTransaction(this.connection, async qr => {
-      const exists = await qr.manager.findOne(UserAccount, { where: { email } });
+      const exists = await qr.manager.findOne(UserAccount, { where: { email, deleted: IsNull() } });
       if (exists) return exists.id;
 
       const newUser = new UserAccount();
