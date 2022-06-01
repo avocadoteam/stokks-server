@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { compare } from 'bcrypt';
 import { UserAccount } from 'src/db/client/tables/UserAccount';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
@@ -18,9 +18,9 @@ export class AuthService {
     this.logger.debug(`Looking for user ${userId}`);
     let user: UserAccount | null;
     if (typeof userId === 'string') {
-      user = await this.ua.findOneBy({ name: String(userId) });
+      user = await this.ua.findOneBy({ name: String(userId), deleted: IsNull() });
     } else {
-      user = await this.ua.findOneBy({ id: userId });
+      user = await this.ua.findOneBy({ id: userId, deleted: IsNull() });
     }
 
     if (user) {

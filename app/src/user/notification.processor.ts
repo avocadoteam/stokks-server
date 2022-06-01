@@ -34,7 +34,7 @@ export class NotificationProcessor {
       .createQueryBuilder('un')
       .innerJoinAndSelect('un.user', 'ua')
       .innerJoinAndSelect('un.stockSymbol', 'ss')
-      .where('un.id = :notificationId and un.triggerName = :triggerName', {
+      .where('un.id = :notificationId and un.triggerName = :triggerName and ua.deleted is null', {
         notificationId,
         triggerName: TriggerName.PriceMatch,
       })

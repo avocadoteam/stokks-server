@@ -89,15 +89,28 @@ export class UserService {
     return userId;
   }
 
+  async deleteUser(userId: number) {
+    await autoRetryTransaction(this.connection, async qr => {
+      const exists = await qr.manager.findOne(UserAccount, { where: { id: userId, deleted: IsNull() } });
+      if (!exists) return;
+
+      exists.deleted = now();
+
+      await qr.manager.save(exists);
+
+      await qr.commitTransaction();
+    });
+  }
+
   async hasUser(userId?: number) {
-    return (await this.ua.count({ where: { id: userId } })) > 0;
+    return (await this.ua.count({ where: { id: userId, deleted: IsNull() } })) > 0;
   }
 
   async hasUserNotification(userId: number, symbol: string) {
     return (
       (await this.un
         .createQueryBuilder('un')
-        .innerJoin('un.user', 'ua', 'ua.id = :userId', { userId })
+        .innerJoin('un.user', 'ua', 'ua.id = :userId and ua.deleted is null', { userId })
         .innerJoin('un.stockSymbol', 'symbol', 'symbol.name = :symbol and symbol.deleted is null', {
           symbol: symbol.toLowerCase(),
         })
@@ -109,7 +122,7 @@ export class UserService {
     const store = await this.uss
       .createQueryBuilder('uss')
       .innerJoinAndSelect('uss.stockSymbol', 'symbol', 'symbol.deleted is null')
-      .innerJoinAndSelect('uss.user', 'ua', 'ua.id = :userId', { userId })
+      .innerJoinAndSelect('uss.user', 'ua', 'ua.id = :userId and ua.deleted is null', { userId })
       .getMany();
 
     if (!store.length) {
@@ -223,7 +236,7 @@ export class UserService {
   async getNotificationBySymbolId(userId: number, symbolId: string): Promise<UserNotificationInfo> {
     const notification = await this.un
       .createQueryBuilder('un')
-      .innerJoin('un.user', 'ua', 'ua.id = :userId', { userId })
+      .innerJoin('un.user', 'ua', 'ua.id = :userId and ua.deleted is null', { userId })
       .innerJoin('un.stockSymbol', 'ss', 'ss.id = :symbolId', { symbolId })
       .getOne();
 

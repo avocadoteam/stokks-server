@@ -35,6 +35,12 @@ export class UserAccount {
   })
   passSalt: Buffer;
 
+  @Column({
+    type: 'timestamp',
+    nullable: true,
+  })
+  deleted: Date | null;
+
   @OneToOne(() => UserStocksStore, uss => uss.user)
   userStocksStore: UserStocksStore;
 

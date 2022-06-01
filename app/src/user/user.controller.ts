@@ -54,6 +54,14 @@ export class UserController {
     return this.us.createGoogleUser(model.email, model.id);
   }
 
+  @ApiResponse({ status: 200 })
+  @Delete()
+  async deleteUser(@UserId() userId: number) {
+    await this.checkUser(userId);
+
+    this.us.deleteUser(userId);
+  }
+
   @ApiResponse({ status: 201 })
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiBody({

@@ -11,6 +11,7 @@ create table user_account (
   email varchar(1024),
   pass_hash bytea not null,
   pass_salt bytea not null,
+  deleted timestamp,
   primary key (user_account_id)
 );
 
