@@ -55,10 +55,10 @@ export class UserController {
   }
 
   @ApiResponse({ status: 200 })
+  @UseGuards(JwtAuthGuard)
   @Delete()
   async deleteUser(@UserId() userId: number) {
     await this.checkUser(userId);
-
     this.us.deleteUser(userId);
   }
 
