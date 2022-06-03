@@ -9,7 +9,7 @@ export class SearchDto implements SearchModel {
 }
 export class TrendingDto implements TrendingModel {
   @IsNumber()
-  @Max(8)
+  @Max(128)
   @Min(1)
   count: number;
 }
